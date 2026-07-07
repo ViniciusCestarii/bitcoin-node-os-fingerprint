@@ -2,7 +2,7 @@
 
 Scans publicly reachable Bitcoin nodes with `nmap -O` to guess their operating
 system, then aggregates the results into general OS classes (Linux, BSD,
-Windows, macOS, Android, etc.) for statistics.
+Windows, macOS, Solaris, etc.) for statistics.
 
 ## Methodology limitations
 
@@ -48,7 +48,12 @@ Windows, macOS, Android, etc.) for statistics.
   different classes, purely from measurement noise. Individual rows can be
   noisy like this; day-over-day runs still land within roughly a percentage
   point on every OS class in aggregate, so treat the per-class *proportions*
-  as the reliable signal, not any single row's classification.
+  as the reliable signal, not any single row's classification. Measured
+  across the two published scans (scan-2026-07-06.csv and scan-2026-07-07.csv): 
+  of the 10,302 targets reachable on both days, 256 (~2.5%) had their `os_class` 
+  flip between runs, mostly `Linux ↔ Unknown` and `Linux ↔ Other/Device`, the
+  same noisy-signature effect as the Synology example, just quantified across 
+  the whole dataset.
 
 - **No OS version information is published.** The filtered dataset only
   keeps a general OS class (e.g. `Linux`, `Windows`), never the specific
@@ -78,23 +83,21 @@ Host state (reachable vs unreachable)
 
 OS class among reachable nodes (n=10580)
 ------------------------------------------------------------
-  Linux                  6645   62.8%  [##################------------]
+  Linux                  6632   62.7%  [##################------------]
   Unknown                2836   26.8%  [########----------------------]
   Windows                 452    4.3%  [#-----------------------------]
-  Other/Device            310    2.9%  [------------------------------]
+  Other/Device            370    3.5%  [#-----------------------------]
   BSD                     194    1.8%  [------------------------------]
   macOS                    95    0.9%  [------------------------------]
-  Android                  47    0.4%  [------------------------------]
   Solaris                   1    0.0%  [------------------------------]
 
 Accuracy by OS class (reachable nodes with a guess)
 ------------------------------------------------------------
-  Linux                n=6645  min=70   avg= 94.6  max=100
+  Linux                n=6632  min=70   avg= 94.6  max=100
   Windows              n=452   min=80   avg= 90.8  max=100
-  Other/Device         n=310   min=85   avg= 91.4  max=100
+  Other/Device         n=370   min=85   avg= 91.2  max=100
   BSD                  n=194   min=85   avg= 90.0  max=100
   macOS                n=95    min=85   avg= 90.0  max=100
-  Android              n=47    min=86   avg= 90.4  max=95
   Unknown              n=21    min=6    avg= 46.8  max=69
   Solaris              n=1     min=87   avg= 87.0  max=87
 
@@ -102,7 +105,7 @@ Legend
 ------------------------------------------------------------
   Unknown: nmap had no OS guess, or the guess scored below 70% accuracy.
   Other/Device: guess matched a router/firewall/printer/appliance or similar, likely a middlebox in front of the node rather than the node itself.
-  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Android, Solaris).
+  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Solaris).
 ```
 
 ```
@@ -120,38 +123,36 @@ Host state (reachable vs unreachable)
 
 OS class among reachable nodes (n=10625)
 ------------------------------------------------------------
-  Linux                  6665   62.7%  [##################------------]
+  Linux                  6653   62.6%  [##################------------]
   Unknown                2852   26.8%  [########----------------------]
   Windows                 453    4.3%  [#-----------------------------]
-  Other/Device            310    2.9%  [------------------------------]
+  Other/Device            370    3.5%  [#-----------------------------]
   BSD                     194    1.8%  [------------------------------]
   macOS                    95    0.9%  [------------------------------]
-  Android                  46    0.4%  [------------------------------]
-  Other                     8    0.1%  [------------------------------]
+  Other                     6    0.1%  [------------------------------]
   Solaris                   2    0.0%  [------------------------------]
 
 Accuracy by OS class (reachable nodes with a guess)
 ------------------------------------------------------------
-  Linux                n=6665  min=72   avg= 94.6  max=100
+  Linux                n=6653  min=72   avg= 94.6  max=100
   Windows              n=453   min=79   avg= 90.9  max=100
-  Other/Device         n=310   min=85   avg= 91.2  max=100
+  Other/Device         n=370   min=85   avg= 91.1  max=100
   BSD                  n=194   min=85   avg= 90.1  max=100
   macOS                n=95    min=85   avg= 90.2  max=100
-  Android              n=46    min=87   avg= 90.8  max=93
   Unknown              n=24    min=6    avg= 46.6  max=69
-  Other                n=8     min=86   avg= 92.6  max=100
+  Other                n=6     min=90   avg= 94.8  max=100
   Solaris              n=2     min=87   avg= 88.0  max=89
 
 Legend
 ------------------------------------------------------------
   Unknown: nmap had no OS guess, or the guess scored below 70% accuracy.
   Other/Device: guess matched a router/firewall/printer/appliance or similar, likely a middlebox in front of the node rather than the node itself.
-  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Android, Solaris).
+  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Solaris).
 ```
 
 These two runs are one day apart, against independently-fetched Bitnodes
 exports, and every OS class lands within about a percentage point of the
-other run (reachable ratio 64.1% vs 63.8%, Linux 62.8% vs 62.7%, Windows
+other run (reachable ratio 64.1% vs 63.8%, Linux 62.7% vs 62.6%, Windows
 4.3% vs 4.3%, and so on). That's the expected outcome: individual hosts can
 flip classification between runs (see the Synology example above), but the
 aggregate distribution is stable, which is what makes it usable as a

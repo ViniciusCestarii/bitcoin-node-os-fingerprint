@@ -798,7 +798,7 @@ ip_address,port,os_class,accuracy,host_state
 168.231.109.52,8333,Linux,89,reachable
 101.36.104.6,8333,Unknown,,reachable
 91.36.90.131,8333,Linux,93,reachable
-216.18.188.159,8333,Linux,87,reachable
+216.18.188.159,8333,Other/Device,87,reachable
 3.120.152.246,8333,Linux,91,reachable
 172.236.12.89,8333,Linux,100,reachable
 85.215.182.153,8333,Linux,97,reachable
@@ -846,7 +846,7 @@ ip_address,port,os_class,accuracy,host_state
 172.234.90.215,8333,Linux,96,reachable
 165.227.164.18,8333,Linux,100,reachable
 146.70.243.143,8333,Linux,97,reachable
-64.44.83.130,8333,Android,90,reachable
+64.44.83.130,8333,Other/Device,90,reachable
 77.37.120.226,8333,Linux,95,reachable
 167.248.15.113,8333,Windows,92,reachable
 40.160.22.51,8333,Linux,93,reachable
@@ -1713,7 +1713,7 @@ ip_address,port,os_class,accuracy,host_state
 194.191.193.172,8333,Unknown,,unreachable
 185.238.131.79,8333,Linux,89,reachable
 89.244.198.75,8333,Unknown,,unreachable
-91.244.70.30,8333,Android,92,reachable
+91.244.70.30,8333,Other/Device,92,reachable
 94.181.46.106,8333,Linux,92,reachable
 71.85.54.8,8333,Windows,87,reachable
 52.205.29.182,8333,Linux,91,reachable
@@ -2242,7 +2242,7 @@ ip_address,port,os_class,accuracy,host_state
 82.66.82.52,8333,Linux,86,reachable
 84.142.248.181,8333,Unknown,,unreachable
 193.237.214.11,8333,Linux,85,reachable
-58.96.73.95,8333,Android,86,reachable
+58.96.73.95,8333,Other/Device,86,reachable
 45.33.1.166,8333,Linux,100,reachable
 109.91.172.89,8333,Linux,87,reachable
 62.34.57.141,8333,Unknown,,unreachable
@@ -2598,7 +2598,7 @@ ip_address,port,os_class,accuracy,host_state
 176.169.76.166,8333,Unknown,,unreachable
 84.48.65.114,8333,Unknown,,reachable
 146.19.230.237,8333,Unknown,,unreachable
-141.98.251.218,8333,Android,92,reachable
+141.98.251.218,8333,Other/Device,92,reachable
 24.252.136.188,8333,Linux,97,reachable
 52.65.41.72,8333,Unknown,,reachable
 91.229.203.102,8333,Unknown,,reachable
@@ -2861,7 +2861,7 @@ ip_address,port,os_class,accuracy,host_state
 81.2.95.103,8333,Linux,90,reachable
 78.73.251.163,8333,Linux,93,reachable
 172.234.253.151,8333,Linux,100,reachable
-46.122.17.85,8333,Android,90,reachable
+46.122.17.85,8333,Other/Device,90,reachable
 93.176.163.54,8333,Unknown,,unreachable
 93.111.72.130,8333,Unknown,,reachable
 89.56.2.225,8333,Linux,100,reachable
@@ -3330,7 +3330,7 @@ ip_address,port,os_class,accuracy,host_state
 84.171.69.135,8333,Unknown,,unreachable
 35.179.229.231,8333,Unknown,,reachable
 71.194.172.64,8333,Linux,97,reachable
-98.40.182.110,8333,Android,92,reachable
+98.40.182.110,8333,Other/Device,92,reachable
 144.2.109.201,8333,Linux,93,reachable
 203.86.195.150,8333,Unknown,,reachable
 217.76.56.29,8333,Other/Device,95,reachable
@@ -3426,7 +3426,7 @@ ip_address,port,os_class,accuracy,host_state
 93.201.177.150,8333,Unknown,,unreachable
 119.74.198.21,8333,Linux,90,reachable
 71.221.79.129,8333,Linux,93,reachable
-45.77.242.77,8333,Android,92,reachable
+45.77.242.77,8333,Other/Device,92,reachable
 46.142.130.61,8333,Unknown,,unreachable
 84.46.17.75,8333,Unknown,,unreachable
 87.106.103.251,8333,Unknown,,unreachable
@@ -3944,7 +3944,7 @@ ip_address,port,os_class,accuracy,host_state
 72.130.154.118,8333,Unknown,,unreachable
 178.63.237.125,8333,Linux,100,reachable
 93.55.82.60,8333,Unknown,,unreachable
-3.37.38.115,8333,Linux,87,reachable
+3.37.38.115,8333,Other/Device,87,reachable
 71.15.136.109,8333,Linux,93,reachable
 157.180.45.80,8333,Linux,95,reachable
 31.220.83.22,8333,Unknown,,reachable
@@ -4190,7 +4190,7 @@ ip_address,port,os_class,accuracy,host_state
 179.181.82.162,8333,Linux,87,reachable
 80.30.108.148,8333,Unknown,,unreachable
 97.115.78.209,8333,Unknown,,reachable
-57.129.83.51,8333,Linux,91,reachable
+57.129.83.51,8333,Other/Device,91,reachable
 77.186.59.28,8333,Unknown,,unreachable
 81.56.178.210,8333,BSD,93,reachable
 193.201.82.205,8333,Linux,100,reachable
@@ -5112,7 +5112,7 @@ ip_address,port,os_class,accuracy,host_state
 199.91.221.116,8333,Linux,95,reachable
 172.105.193.193,8333,Linux,96,reachable
 13.247.1.70,8333,Unknown,,reachable
-46.4.5.116,8333,Android,92,reachable
+46.4.5.116,8333,Other/Device,92,reachable
 185.19.87.26,8333,Linux,91,reachable
 2.241.116.19,8333,Unknown,,unreachable
 81.33.51.28,8333,Unknown,,unreachable
@@ -5393,7 +5393,7 @@ ip_address,port,os_class,accuracy,host_state
 136.28.10.44,8333,macOS,87,reachable
 188.243.214.149,8333,Unknown,,reachable
 70.53.202.244,8333,Unknown,,reachable
-45.33.71.93,8333,Android,88,reachable
+45.33.71.93,8333,Other/Device,88,reachable
 82.64.147.66,8333,Linux,97,reachable
 93.237.208.174,8333,Linux,85,reachable
 64.17.93.200,8333,Linux,97,reachable
@@ -5425,8 +5425,8 @@ ip_address,port,os_class,accuracy,host_state
 62.205.134.30,8333,Linux,96,reachable
 113.150.87.158,8333,Windows,88,reachable
 167.224.144.59,8333,Linux,93,reachable
-52.15.138.15,8333,Linux,87,reachable
-104.167.218.213,8333,Android,87,reachable
+52.15.138.15,8333,Other/Device,87,reachable
+104.167.218.213,8333,Other/Device,87,reachable
 96.232.197.113,8333,Linux,93,reachable
 54.195.191.137,8333,Unknown,,unreachable
 116.203.87.70,8333,Linux,100,reachable
@@ -5725,7 +5725,7 @@ ip_address,port,os_class,accuracy,host_state
 188.192.229.52,8333,Unknown,,unreachable
 185.48.76.27,8333,Unknown,,unreachable
 148.113.159.109,8333,Unknown,,reachable
-180.150.21.3,8333,Linux,87,reachable
+180.150.21.3,8333,Other/Device,87,reachable
 91.67.79.173,8333,Linux,89,reachable
 116.202.180.130,8333,Linux,93,reachable
 13.50.230.87,8333,Unknown,,reachable
@@ -5733,15 +5733,15 @@ ip_address,port,os_class,accuracy,host_state
 116.203.166.22,8333,Linux,93,reachable
 144.2.109.34,8333,macOS,89,reachable
 136.35.162.191,8333,Linux,93,reachable
-185.146.157.3,8333,Android,92,reachable
+185.146.157.3,8333,Other/Device,92,reachable
 86.127.245.138,8333,Unknown,,unreachable
 98.111.185.117,8333,Linux,87,reachable
-203.18.30.48,8333,Android,95,reachable
+203.18.30.48,8333,Other/Device,95,reachable
 97.117.90.25,8333,Unknown,,unreachable
 91.59.148.61,8333,Unknown,,unreachable
 75.156.111.155,8333,Linux,93,reachable
 82.85.110.20,8333,Linux,85,reachable
-51.81.56.15,8333,Linux,97,reachable
+51.81.56.15,8333,Other/Device,97,reachable
 82.64.193.144,8333,Unknown,,unreachable
 44.219.125.103,8333,Windows,91,reachable
 195.213.196.52,8333,Unknown,,unreachable
@@ -6452,7 +6452,7 @@ ip_address,port,os_class,accuracy,host_state
 80.188.97.251,8333,Linux,89,reachable
 79.216.210.53,8333,Unknown,,unreachable
 97.115.127.68,8333,Linux,90,reachable
-93.99.194.150,8333,Android,88,reachable
+93.99.194.150,8333,Other/Device,88,reachable
 172.105.64.160,8333,Linux,100,reachable
 79.219.193.118,8333,Unknown,,unreachable
 172.104.247.94,8333,Linux,100,reachable
@@ -6538,7 +6538,7 @@ ip_address,port,os_class,accuracy,host_state
 178.104.82.164,8333,Unknown,,unreachable
 84.247.165.249,8333,Unknown,,unreachable
 87.168.252.1,8333,Unknown,,unreachable
-1.32.9.24,8333,Android,91,reachable
+1.32.9.24,8333,Other/Device,91,reachable
 23.112.5.114,8333,Unknown,,unreachable
 38.242.135.230,8333,Unknown,,unreachable
 104.192.42.140,8333,Linux,100,reachable
@@ -6662,7 +6662,7 @@ ip_address,port,os_class,accuracy,host_state
 37.117.106.187,8333,Unknown,,unreachable
 184.101.143.125,8333,Linux,94,reachable
 67.82.34.115,8333,Unknown,,unreachable
-78.47.206.116,8333,Android,92,reachable
+78.47.206.116,8333,Other/Device,92,reachable
 94.113.85.202,8333,Linux,97,reachable
 217.245.171.230,8333,Unknown,,unreachable
 93.130.153.35,8333,Unknown,,unreachable
@@ -7116,7 +7116,7 @@ ip_address,port,os_class,accuracy,host_state
 69.204.79.131,8333,Linux,89,reachable
 99.120.246.104,8333,Linux,93,reachable
 52.57.165.2,8333,Unknown,,reachable
-168.196.132.252,8333,Android,88,reachable
+168.196.132.252,8333,Other/Device,88,reachable
 5.63.47.32,8333,Unknown,,unreachable
 169.0.213.201,8333,Unknown,,unreachable
 95.46.165.78,8333,Unknown,,unreachable
@@ -7513,7 +7513,7 @@ ip_address,port,os_class,accuracy,host_state
 174.56.78.126,8333,Linux,91,reachable
 15.235.229.24,8333,Unknown,,reachable
 172.236.233.143,8333,Linux,100,reachable
-91.84.79.241,8333,Android,93,reachable
+91.84.79.241,8333,Other/Device,93,reachable
 3.81.50.230,8333,Unknown,,unreachable
 194.14.246.251,8333,Linux,91,reachable
 118.99.119.81,8333,Unknown,,unreachable
@@ -7782,7 +7782,7 @@ ip_address,port,os_class,accuracy,host_state
 71.194.146.146,8333,Unknown,,unreachable
 94.4.212.182,8333,Linux,90,reachable
 77.247.151.58,8333,Linux,89,reachable
-170.75.161.236,8333,Android,88,reachable
+170.75.161.236,8333,Other/Device,88,reachable
 109.234.59.84,8333,Linux,100,reachable
 24.147.226.224,8333,Linux,91,reachable
 212.241.89.128,8333,Other/Device,86,reachable
@@ -7947,7 +7947,7 @@ ip_address,port,os_class,accuracy,host_state
 172.236.20.230,8333,Linux,100,reachable
 185.85.254.103,8333,Linux,90,reachable
 37.187.141.34,8333,Linux,95,reachable
-51.79.162.31,8333,Linux,95,reachable
+51.79.162.31,8333,Other/Device,95,reachable
 172.234.18.166,8333,Linux,100,reachable
 46.27.81.38,8333,Linux,92,reachable
 37.14.200.163,8333,Unknown,,unreachable
@@ -7985,7 +7985,7 @@ ip_address,port,os_class,accuracy,host_state
 109.173.198.67,8333,Linux,100,reachable
 45.79.201.157,8333,Unknown,,unreachable
 85.247.116.20,8333,Other/Device,88,reachable
-5.182.4.118,8333,Android,92,reachable
+5.182.4.118,8333,Other/Device,92,reachable
 75.164.233.101,8333,Unknown,,unreachable
 125.181.201.95,8333,Linux,97,reachable
 71.13.37.41,8333,Unknown,,unreachable
@@ -8022,7 +8022,7 @@ ip_address,port,os_class,accuracy,host_state
 163.123.157.11,8333,Unknown,,unreachable
 178.61.141.198,8333,Unknown,,reachable
 83.77.81.25,8333,Unknown,,unreachable
-49.12.200.217,8333,Android,92,reachable
+49.12.200.217,8333,Other/Device,92,reachable
 178.63.42.73,8333,Linux,96,reachable
 64.94.85.75,8333,Linux,93,reachable
 159.89.104.55,8333,Linux,100,reachable
@@ -8182,7 +8182,7 @@ ip_address,port,os_class,accuracy,host_state
 71.34.231.134,8333,Linux,97,reachable
 35.240.252.177,8333,Linux,93,reachable
 172.233.211.171,8333,Other/Device,86,reachable
-107.173.248.122,8333,Android,92,reachable
+107.173.248.122,8333,Other/Device,92,reachable
 185.130.44.100,8333,Linux,95,reachable
 79.132.233.59,8333,Unknown,,reachable
 89.245.216.104,8333,Unknown,,unreachable
@@ -8374,7 +8374,7 @@ ip_address,port,os_class,accuracy,host_state
 76.89.134.129,8333,Linux,93,reachable
 18.197.26.115,8333,Linux,91,reachable
 172.105.244.125,8333,Linux,100,reachable
-170.75.161.116,8333,Android,88,reachable
+170.75.161.116,8333,Other/Device,88,reachable
 23.233.141.8,8333,Unknown,,unreachable
 69.164.245.28,8333,Linux,100,reachable
 35.235.115.218,8333,Linux,93,reachable
@@ -8812,7 +8812,7 @@ ip_address,port,os_class,accuracy,host_state
 121.98.205.100,8333,Windows,87,reachable
 178.63.182.174,8333,Linux,97,reachable
 5.149.248.87,8333,Linux,100,reachable
-141.227.158.159,8333,Android,91,reachable
+141.227.158.159,8333,Other/Device,91,reachable
 31.21.86.55,8333,Other/Device,93,reachable
 46.124.62.43,8333,Unknown,,unreachable
 79.116.184.86,8333,Linux,95,reachable
@@ -8886,7 +8886,7 @@ ip_address,port,os_class,accuracy,host_state
 80.139.1.228,8333,Unknown,,unreachable
 95.216.13.117,8333,Linux,100,reachable
 110.239.52.7,8333,Linux,87,reachable
-78.47.40.73,8333,Linux,93,reachable
+78.47.40.73,8333,Other/Device,93,reachable
 91.156.247.4,8333,Unknown,,unreachable
 178.230.199.104,8333,Unknown,,unreachable
 102.119.236.118,8333,Unknown,,unreachable
@@ -8951,7 +8951,7 @@ ip_address,port,os_class,accuracy,host_state
 79.117.125.250,8333,Unknown,,unreachable
 112.222.114.14,8333,Unknown,,unreachable
 97.240.200.31,8333,Unknown,,unreachable
-91.148.48.104,8333,Android,88,reachable
+91.148.48.104,8333,Other/Device,88,reachable
 67.145.134.218,8333,Linux,93,reachable
 69.57.160.244,8333,Linux,94,reachable
 172.104.136.41,8333,Linux,100,reachable
@@ -8967,7 +8967,7 @@ ip_address,port,os_class,accuracy,host_state
 72.74.148.166,8333,Linux,87,reachable
 176.9.17.121,8333,Linux,96,reachable
 84.143.135.198,8333,Unknown,,unreachable
-160.16.205.60,8333,Android,92,reachable
+160.16.205.60,8333,Other/Device,92,reachable
 194.46.230.214,8333,Unknown,,unreachable
 45.33.1.119,8333,Linux,100,reachable
 79.116.84.53,8333,Unknown,,unreachable
@@ -8997,7 +8997,7 @@ ip_address,port,os_class,accuracy,host_state
 179.82.44.147,8333,Unknown,,unreachable
 84.155.210.136,8333,Unknown,,unreachable
 98.110.224.250,8333,Linux,87,reachable
-107.173.244.87,8333,Android,92,reachable
+107.173.244.87,8333,Other/Device,92,reachable
 125.141.127.176,8333,Unknown,,unreachable
 194.5.248.85,8333,Linux,97,reachable
 79.249.250.130,8333,Linux,89,reachable
@@ -9130,7 +9130,7 @@ ip_address,port,os_class,accuracy,host_state
 80.254.174.149,8333,Linux,97,reachable
 66.168.76.212,8333,Linux,93,reachable
 109.157.65.15,8333,Unknown,,reachable
-5.15.8.45,8333,Android,92,reachable
+5.15.8.45,8333,Other/Device,92,reachable
 3.70.4.2,8333,Unknown,,reachable
 76.72.146.59,8333,Unknown,,unreachable
 51.37.250.160,8333,Unknown,,unreachable
@@ -9533,7 +9533,7 @@ ip_address,port,os_class,accuracy,host_state
 46.105.124.30,8333,Linux,100,reachable
 69.171.122.148,8333,Unknown,,unreachable
 71.185.186.173,8333,Linux,93,reachable
-62.31.16.114,8333,Android,91,reachable
+62.31.16.114,8333,Other/Device,91,reachable
 92.27.11.83,8333,Unknown,,unreachable
 82.64.203.33,8333,Linux,97,reachable
 97.122.165.89,8333,Unknown,,unreachable
@@ -9964,7 +9964,7 @@ ip_address,port,os_class,accuracy,host_state
 139.162.128.31,8333,Linux,100,reachable
 82.67.3.40,8333,Linux,97,reachable
 95.84.162.152,8333,Windows,90,reachable
-15.204.102.129,8333,Linux,91,reachable
+15.204.102.129,8333,Other/Device,91,reachable
 186.235.86.249,8333,BSD,93,reachable
 185.108.209.79,8333,Linux,92,reachable
 73.232.7.136,8333,Unknown,,unreachable
@@ -10043,7 +10043,7 @@ ip_address,port,os_class,accuracy,host_state
 62.167.101.110,8333,Unknown,,unreachable
 216.240.80.26,8333,Unknown,,unreachable
 153.160.56.47,8333,Unknown,,reachable
-80.253.165.14,8333,Android,92,reachable
+80.253.165.14,8333,Other/Device,92,reachable
 95.211.152.100,8333,Linux,100,reachable
 66.52.20.190,8333,Windows,89,reachable
 82.141.77.26,8333,Unknown,,reachable
@@ -10292,7 +10292,7 @@ ip_address,port,os_class,accuracy,host_state
 172.233.49.144,8333,Linux,96,reachable
 176.126.73.74,8333,Unknown,,unreachable
 82.45.63.197,8333,Linux,97,reachable
-170.75.166.57,8333,Android,88,reachable
+170.75.166.57,8333,Other/Device,88,reachable
 69.140.77.11,8333,Unknown,,unreachable
 70.113.109.21,8333,Linux,93,reachable
 85.48.52.152,8333,Linux,91,reachable
@@ -10401,7 +10401,7 @@ ip_address,port,os_class,accuracy,host_state
 191.199.189.22,8333,Linux,100,reachable
 118.101.243.232,8333,Unknown,,unreachable
 41.71.18.138,8333,Other/Device,96,reachable
-13.115.227.250,8333,Linux,87,reachable
+13.115.227.250,8333,Other/Device,87,reachable
 134.128.12.227,8333,Unknown,,unreachable
 205.201.63.13,8333,Other/Device,86,reachable
 41.72.158.202,8333,Linux,96,reachable
@@ -11107,7 +11107,7 @@ ip_address,port,os_class,accuracy,host_state
 73.209.185.7,8333,Linux,89,reachable
 84.166.229.242,8333,Unknown,,unreachable
 109.123.213.131,8333,Linux,97,reachable
-3.92.161.157,8333,Linux,87,reachable
+3.92.161.157,8333,Other/Device,87,reachable
 34.180.25.245,8333,Other/Device,93,reachable
 85.130.189.204,8333,Other/Device,100,reachable
 31.31.105.72,8333,Unknown,,unreachable
@@ -11208,7 +11208,7 @@ ip_address,port,os_class,accuracy,host_state
 72.230.237.11,8333,Unknown,,reachable
 174.89.143.6,8333,Unknown,,unreachable
 172.235.39.230,8333,Linux,97,reachable
-91.135.0.187,8333,Linux,95,reachable
+91.135.0.187,8333,Other/Device,95,reachable
 175.43.240.53,8333,Unknown,,unreachable
 155.186.231.61,8333,Linux,91,reachable
 83.240.108.13,8333,Linux,93,reachable
@@ -11243,7 +11243,7 @@ ip_address,port,os_class,accuracy,host_state
 94.16.122.152,8333,Linux,97,reachable
 96.248.96.215,8333,Unknown,,unreachable
 172.232.39.117,8333,Linux,96,reachable
-46.232.250.150,8333,Android,88,reachable
+46.232.250.150,8333,Other/Device,88,reachable
 84.47.6.36,8333,Unknown,,reachable
 139.162.171.12,8333,Linux,100,reachable
 68.185.183.72,8333,Windows,91,reachable
@@ -11308,7 +11308,7 @@ ip_address,port,os_class,accuracy,host_state
 51.79.49.206,8333,Other/Device,100,reachable
 149.224.62.67,8333,Unknown,,unreachable
 34.205.241.150,8333,Unknown,,reachable
-189.79.17.162,8333,Android,92,reachable
+189.79.17.162,8333,Other/Device,92,reachable
 178.113.72.165,8333,Unknown,,unreachable
 66.228.54.112,8333,Linux,100,reachable
 92.63.100.22,8333,Linux,100,reachable
@@ -11424,7 +11424,7 @@ ip_address,port,os_class,accuracy,host_state
 87.148.250.205,8333,Unknown,,unreachable
 71.81.211.63,8333,Unknown,,unreachable
 35.157.36.205,8333,Unknown,,reachable
-146.70.83.178,8333,Android,93,reachable
+146.70.83.178,8333,Other/Device,93,reachable
 31.17.63.178,8333,Unknown,,unreachable
 50.53.14.219,8333,Linux,93,reachable
 97.235.174.236,8333,Unknown,,unreachable
@@ -11716,7 +11716,7 @@ ip_address,port,os_class,accuracy,host_state
 155.4.82.77,8333,Windows,89,reachable
 46.249.191.157,8333,Windows,91,reachable
 34.64.109.126,8333,Linux,93,reachable
-103.3.60.246,8333,Android,87,reachable
+103.3.60.246,8333,Other/Device,87,reachable
 104.199.67.60,8333,Linux,93,reachable
 81.131.138.182,8333,Unknown,,unreachable
 81.136.15.5,8333,Unknown,,unreachable
@@ -11814,7 +11814,7 @@ ip_address,port,os_class,accuracy,host_state
 68.117.210.25,8333,Linux,91,reachable
 85.1.144.126,8333,Linux,91,reachable
 3.72.145.61,8333,Linux,91,reachable
-216.18.201.202,8333,Linux,89,reachable
+216.18.201.202,8333,Other/Device,89,reachable
 74.207.228.5,8333,Linux,100,reachable
 2.25.195.21,8333,Linux,93,reachable
 85.85.182.69,8333,Unknown,,unreachable
@@ -12153,7 +12153,7 @@ ip_address,port,os_class,accuracy,host_state
 74.105.13.143,8333,Unknown,,unreachable
 96.19.135.48,8333,Unknown,,unreachable
 89.245.209.12,8333,Unknown,,unreachable
-43.224.180.96,8333,Android,92,reachable
+43.224.180.96,8333,Other/Device,92,reachable
 93.211.245.75,8333,Unknown,,unreachable
 95.33.168.12,8333,Unknown,,unreachable
 80.147.194.242,8333,Unknown,,reachable
@@ -12460,7 +12460,7 @@ ip_address,port,os_class,accuracy,host_state
 154.251.213.102,8333,Unknown,,unreachable
 62.27.247.54,8333,Unknown,,unreachable
 172.233.153.210,8333,Linux,99,reachable
-186.207.62.211,8333,Android,87,reachable
+186.207.62.211,8333,Other/Device,87,reachable
 31.208.21.69,8333,Linux,89,reachable
 188.4.159.32,8333,Linux,85,reachable
 38.102.85.36,8333,Linux,97,reachable
@@ -15717,7 +15717,7 @@ ip_address,port,os_class,accuracy,host_state
 75.253.230.140,9333,Unknown,,unreachable
 184.101.89.106,9333,Unknown,,unreachable
 121.169.165.207,9333,Linux,100,reachable
-58.136.238.217,9333,Android,89,reachable
+58.136.238.217,9333,Other/Device,89,reachable
 174.22.109.229,9333,Unknown,,unreachable
 202.53.45.151,9333,Unknown,,unreachable
 99.234.168.45,9333,Linux,100,reachable
@@ -15859,7 +15859,7 @@ ip_address,port,os_class,accuracy,host_state
 67.2.6.195,9333,Unknown,,unreachable
 91.63.30.243,9333,Unknown,,unreachable
 134.22.106.148,9333,Unknown,,unreachable
-5.37.182.255,9333,Android,92,reachable
+5.37.182.255,9333,Other/Device,92,reachable
 174.22.217.127,9333,Linux,90,reachable
 38.35.206.247,9333,Linux,100,reachable
 47.33.73.119,9333,Linux,97,reachable
@@ -15879,7 +15879,7 @@ ip_address,port,os_class,accuracy,host_state
 192.228.131.166,9333,Linux,95,reachable
 23.113.234.250,9333,Linux,93,reachable
 66.183.148.124,9333,Unknown,,unreachable
-172.81.183.75,9333,Android,88,reachable
+172.81.183.75,9333,Other/Device,88,reachable
 58.136.206.134,9333,Unknown,,unreachable
 79.116.76.81,9333,Unknown,,unreachable
 124.54.138.151,9333,Linux,97,reachable
@@ -15900,7 +15900,7 @@ ip_address,port,os_class,accuracy,host_state
 94.61.30.182,9333,Linux,95,reachable
 188.63.154.37,9333,Unknown,,unreachable
 184.103.181.32,9333,Unknown,,unreachable
-60.133.209.229,9333,Android,91,reachable
+60.133.209.229,9333,Other/Device,91,reachable
 79.116.85.37,9333,Unknown,,reachable
 88.91.45.29,9333,Linux,100,reachable
 159.147.70.240,9333,Unknown,,unreachable
@@ -15989,7 +15989,7 @@ ip_address,port,os_class,accuracy,host_state
 76.126.158.137,8334,Unknown,,unreachable
 186.30.183.67,8334,Unknown,,unreachable
 217.224.177.116,8334,Unknown,,unreachable
-122.199.61.218,8334,Android,88,reachable
+122.199.61.218,8334,Other/Device,88,reachable
 196.210.41.177,8334,Unknown,,unreachable
 96.244.149.90,8334,Unknown,,unreachable
 213.76.63.61,8334,Unknown,,unreachable
@@ -16141,7 +16141,7 @@ ip_address,port,os_class,accuracy,host_state
 184.95.32.134,8336,Linux,94,reachable
 2a0d:3341:b470:9501:c185:58ba:a51c:363c,8336,Unknown,,unreachable
 45.118.67.71,8335,Linux,91,reachable
-128.140.91.32,10112,Android,92,reachable
+128.140.91.32,10112,Other/Device,92,reachable
 172.105.179.145,8555,Linux,100,reachable
 130.60.183.111,8555,Unknown,,unreachable
 65.21.238.39,8555,Linux,100,reachable
@@ -16222,12 +16222,12 @@ ip_address,port,os_class,accuracy,host_state
 152.114.194.200,19260,Linux,87,reachable
 37.27.63.70,19260,Linux,90,reachable
 195.154.210.36,19260,Linux,90,reachable
-177.54.145.109,19260,Android,89,reachable
-91.218.244.89,19260,Android,89,reachable
+177.54.145.109,19260,Other/Device,89,reachable
+91.218.244.89,19260,Other/Device,89,reachable
 156.67.62.53,19260,Linux,90,reachable
 45.80.212.5,19260,Unknown,,unreachable
 64.120.114.165,19260,Linux,89,reachable
-172.241.31.200,19260,Android,89,reachable
+172.241.31.200,19260,Other/Device,89,reachable
 88.99.59.165,19260,Linux,90,reachable
 23.105.162.48,19260,Linux,87,reachable
 57.129.73.74,8305,Unknown,,reachable
@@ -16361,7 +16361,7 @@ ip_address,port,os_class,accuracy,host_state
 195.80.233.112,54327,Linux,85,reachable
 198.44.159.35,27132,Unknown,,unreachable
 199.85.8.7,63239,Linux,100,reachable
-46.13.173.34,48539,Android,92,reachable
+46.13.173.34,48539,Other/Device,92,reachable
 198.44.157.147,65139,Other/Device,86,reachable
 78.71.136.214,31337,Unknown,,reachable
 198.44.129.211,51502,Other/Device,86,reachable
@@ -16461,7 +16461,7 @@ ip_address,port,os_class,accuracy,host_state
 34.169.115.35,32441,Unknown,,reachable
 34.91.151.153,30333,Unknown,,reachable
 34.83.137.255,32407,Linux,100,reachable
-65.109.64.54,30333,Android,92,reachable
+65.109.64.54,30333,Other/Device,92,reachable
 35.252.123.150,31256,Unknown,,reachable
 37.57.129.92,8514,Linux,97,reachable
 40.160.2.80,52149,Linux,91,reachable

@@ -15,7 +15,7 @@ DEVICE_KEYWORDS = [
     "check point", "sonicos", "cisco", "juniper", "netgear", "asus",
     "d-link", "tp-link", "zyxel", "aruba", "aerohive", "mikrotik",
     "ubiquiti", "sonos", "xbox", "blu-ray", "iphone", "apple ios",
-    "micropython", "monitor"
+    "micropython", "monitor", "android",
 ]
 
 OS_CLASS_PATTERNS = [
@@ -23,7 +23,6 @@ OS_CLASS_PATTERNS = [
     ("BSD", re.compile(r"\b(free|open|net)bsd\b", re.I)),
     ("Windows", re.compile(r"\bwindows\b", re.I)),
     ("macOS", re.compile(r"\b(mac ?os|darwin)\b", re.I)),
-    ("Android", re.compile(r"\bandroid\b", re.I)),
     ("Solaris", re.compile(r"\bsolaris\b", re.I)),
 ]
 

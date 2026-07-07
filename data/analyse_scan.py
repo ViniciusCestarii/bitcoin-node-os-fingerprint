@@ -20,7 +20,7 @@ OS_CLASS_LEGEND = {
     "Other/Device": "guess matched a router/firewall/printer/appliance or similar, "
                      "likely a middlebox in front of the node rather than the node itself.",
     "Other": "guess matched an OS outside the tracked classes (Linux, BSD, Windows, "
-             "macOS, Android, Solaris).",
+             "macOS, Solaris).",
 }
 
 
