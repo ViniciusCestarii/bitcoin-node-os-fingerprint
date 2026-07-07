@@ -31,7 +31,7 @@ def run_nmap(ip, port, host_timeout, ipv6=False):
         "sudo", "nmap", "-O", "--osscan-guess", "-T4",
         "-PS" + str(port),
         "--host-timeout", host_timeout,
-        "-p", f"1,{port}", "-oX", "-", ip,
+        "-p", port, "-oX", "-", ip,
     ]
     if ipv6:
         cmd.insert(2, "-6")
