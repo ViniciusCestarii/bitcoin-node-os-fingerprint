@@ -31,7 +31,7 @@ def run_nmap(ip, port, host_timeout, ipv6=False):
         "sudo", "nmap", "-O", "--osscan-guess", "-T4",
         "-PS" + str(port),
         "--host-timeout", host_timeout,
-        "-p", f"1,{port}", "-oX", "-", ip,
+        "-p", port, "-oX", "-", ip,
     ]
     if ipv6:
         cmd.insert(2, "-6")
@@ -53,12 +53,12 @@ def extraports_state(host):
 
 def xml_to_row(xml_output, ip, port):
     if not xml_output.strip():
-        return [ip, port, "", "", "no-response", "", "", "", ""]
+        return [ip, port, "", "", "no-response", "", ""]
 
     root = ET.fromstring(xml_output)
     host = root.find("host")
     if host is None:
-        return [ip, port, "", "", "down", "", "", "", ""]
+        return [ip, port, "", "", "down", "", ""]
 
     status = host.find("status")
     host_state = status.get("state") if status is not None else ""
@@ -69,29 +69,19 @@ def xml_to_row(xml_output, ip, port):
     if str(port) in ports_by_id:
         state = ports_by_id[str(port)].find("state")
         port_state, port_reason = state.get("state"), state.get("reason")
-
-    ref_port_state, ref_port_reason = "", ""
-    if "1" in ports_by_id:
-        state = ports_by_id["1"].find("state")
-        ref_port_state, ref_port_reason = state.get("state"), state.get("reason")
-
-    if not port_state or not ref_port_state:
-        ep_state, ep_reason = extraports_state(host)
-        if not port_state:
-            port_state, port_reason = ep_state, ep_reason
-        if not ref_port_state:
-            ref_port_state, ref_port_reason = ep_state, ep_reason
+    else:
+        port_state, port_reason = extraports_state(host)
 
     osmatch = host.find("os/osmatch")
     name = osmatch.get("name") if osmatch is not None else ""
     accuracy = osmatch.get("accuracy") if osmatch is not None else ""
 
-    return [ip, port, name, accuracy, host_state, port_state, port_reason, ref_port_state, ref_port_reason]
+    return [ip, port, name, accuracy, host_state, port_state, port_reason]
 
 
 CSV_HEADER = [
     "ip_address", "port", "os_name", "accuracy",
-    "host_state", "port_state", "port_reason", "ref_port_state", "ref_port_reason",
+    "host_state", "port_state", "port_reason",
 ]
 
 

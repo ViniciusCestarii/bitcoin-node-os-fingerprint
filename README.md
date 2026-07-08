@@ -17,13 +17,25 @@ Windows, macOS, Solaris, etc.) for statistics.
   probes in front of the actual node, the fingerprint can describe that
   device instead of the machine actually running the Bitcoin software.
 
-- **nmap performs best with one open port and one closed port to compare.**
-  Many hosts here have the open Bitcoin port but no genuinely *closed*
-  reference port, connections to a second port are simply dropped (filtered)
-  by a firewall instead of being actively rejected (closed). Filtered
-  reference ports give nmap less signal, which lowers confidence and
-  increases the `Unknown` rate (but this is a good signal that operators are 
-  configuring a firewall for their bitcoin nodes).
+- **Scans only probe the single Bitcoin port, not a second reference port.**
+  Earlier versions of `os_fingerprint.py` also probed port 1 as a "closed
+  port" reference, since nmap's documentation recommends pairing one open
+  and one closed port for OS detection. Testing that against a single-port
+  scan of the same hosts showed the opposite of what nmap's general advice
+  suggests: of 422 hosts that got no OS match at all with the reference
+  port included, 91% had a perfectly normal `closed/reset` response on that
+  port, yet still failed to match, while removing it and scanning only the
+  real port let nmap match most of them. The likely reason: many Bitcoin
+  nodes sit behind a middlebox with port forwarding configured only for
+  the Bitcoin port. The open-port probe gets forwarded through to the real
+  node, but port 1 is almost never forwarded, so that probe (and its
+  closed/reset response) came from the router/middlebox itself, not the
+  node. Nmap ended up building one fingerprint out of TCP/IP stack
+  behavior from two different devices, which is internally inconsistent
+  enough that it matches no single-OS signature. Scans from before this
+  change (`scan-2026-07-06-legacy.csv`, `scan-2026-07-07-legacy.csv`) used the two-port
+  method and anything scanned after use the single-port method. The old files
+  are left as-is rather than retroactively rescanned.
 
 - **A large share of nodes were unreachable.** Many hosts in the source list
   are down, offline, or configured to refuse inbound connections entirely
@@ -38,22 +50,15 @@ Windows, macOS, Solaris, etc.) for statistics.
   is downgraded to `Unknown` rather than kept as a shaky classification.
 
 - **Fingerprints for the same host aren't fully reproducible across scans.**
-  On one host I observed nmap return `Synology DiskStation Manager 5.2-5644`
-  on one run and `Linux 3.4 - 3.10` on another, same IP, same port, same 97%
-  accuracy. Synology's DSM is Linux-based, so its real fingerprint sits
-  almost exactly between those two signatures in nmap's database; small
-  scan-to-scan network noise (timing jitter, retransmissions) is enough to
-  flip which one scores marginally higher. That flip also changes the
-  `os_class` bucket entirely (`Linux` vs `Other`), same physical box, two
-  different classes, purely from measurement noise. Individual rows can be
-  noisy like this; day-over-day runs still land within roughly a percentage
-  point on every OS class in aggregate, so treat the per-class *proportions*
-  as the reliable signal, not any single row's classification. Measured
-  across the two published scans (scan-2026-07-06.csv and scan-2026-07-07.csv): 
-  of the 10,302 targets reachable on both days, 256 (~2.5%) had their `os_class` 
-  flip between runs, mostly `Linux ↔ Unknown` and `Linux ↔ Other/Device`, the
-  same noisy-signature effect as the Synology example, just quantified across 
-  the whole dataset.
+  On one host nmap returned `Synology DiskStation Manager 5.2-5644` on one
+  run and `Linux 3.4 - 3.10` on another, same IP, same port, same 97%
+  accuracy. Synology's DSM is Linux-based, so scan-to-scan noise is enough
+  to flip which signature scores marginally higher, which also flips the
+  `os_class` bucket (`Linux` vs `Other/Device`) for the same physical box. Across
+  the two legacy scans, 256 of 10,302 hosts reachable on both days (~2.5%)
+  flipped `os_class` this way, mostly `Linux ↔ Unknown` and `Linux ↔
+  Other/Device`. Treat per-class *proportions* as the reliable signal, not
+  any single row's classification.
 
 - **No OS version information is published.** The filtered dataset only
   keeps a general OS class (e.g. `Linux`, `Windows`), never the specific
@@ -68,95 +73,66 @@ directory for the CSV, and the scripts that produce them.
 
 ## Analysis
 
+The two-port method was retired in favor of the single-port method (see
+above), so its two legacy runs (`scan-2026-07-06-legacy.csv` and
+`scan-2026-07-07-legacy.csv`) are omitted here. For the record: they landed
+within about a percentage point of each other on every OS class (reachable
+ratio 64.1% vs 63.8%, Linux 62.7% vs 62.6%, Windows 4.3% vs 4.3%, and so
+on) despite being one day apart against independently-fetched Bitnodes
+exports, individual hosts can flip classification between runs (see the
+Synology example above), but the aggregate distribution is stable, which is
+what makes it usable as a statistic in the first place. Their raw output is
+still in `data/` if you want the numbers.
+
 ```
-python3 analyse_scan.py scan-2026-07-06.csv
+python3 analyse_scan.py scan-2026-07-08.csv
 
 ============================================================
-Scan file: scan-2026-07-06.csv
-Total records: 16516
+Scan file: scan-2026-07-08.csv
+Total records: 16795
 ============================================================
 
 Host state (reachable vs unreachable)
 ------------------------------------------------------------
-  reachable             10580   64.1%  [###################-----------]
-  unreachable            5936   35.9%  [##########--------------------]
+  reachable             10645   63.4%  [###################-----------]
+  unreachable            6150   36.6%  [##########--------------------]
 
-OS class among reachable nodes (n=10580)
+OS class among reachable nodes (n=10645)
 ------------------------------------------------------------
-  Linux                  6632   62.7%  [##################------------]
-  Unknown                2836   26.8%  [########----------------------]
-  Windows                 452    4.3%  [#-----------------------------]
-  Other/Device            370    3.5%  [#-----------------------------]
-  BSD                     194    1.8%  [------------------------------]
+  Linux                  7544   70.9%  [#####################---------]
+  Unknown                1978   18.6%  [#####-------------------------]
+  Windows                 483    4.5%  [#-----------------------------]
+  Other/Device            272    2.6%  [------------------------------]
+  BSD                     177    1.7%  [------------------------------]
   macOS                    95    0.9%  [------------------------------]
+  Android                  95    0.9%  [------------------------------]
   Solaris                   1    0.0%  [------------------------------]
 
 Accuracy by OS class (reachable nodes with a guess)
 ------------------------------------------------------------
-  Linux                n=6632  min=70   avg= 94.6  max=100
-  Windows              n=452   min=80   avg= 90.8  max=100
-  Other/Device         n=370   min=85   avg= 91.2  max=100
-  BSD                  n=194   min=85   avg= 90.0  max=100
-  macOS                n=95    min=85   avg= 90.0  max=100
-  Unknown              n=21    min=6    avg= 46.8  max=69
+  Linux                n=7544  min=71   avg= 95.4  max=100
+  Windows              n=483   min=81   avg= 92.5  max=100
+  Other/Device         n=272   min=85   avg= 93.5  max=100
+  BSD                  n=177   min=85   avg= 91.4  max=100
+  macOS                n=95    min=85   avg= 93.2  max=100
+  Android              n=95    min=87   avg= 91.9  max=100
+  Unknown              n=24    min=1    avg= 20.9  max=66
   Solaris              n=1     min=87   avg= 87.0  max=87
 
 Legend
 ------------------------------------------------------------
   Unknown: nmap had no OS guess, or the guess scored below 70% accuracy.
   Other/Device: guess matched a router/firewall/printer/appliance or similar, likely a middlebox in front of the node rather than the node itself.
-  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Solaris).
+  Other: guess matched an OS outside the tracked classes (Linux, Android, BSD, Windows, macOS, Solaris).
 ```
 
-```
-python3 analyse_scan.py scan-2026-07-07.csv
-
-============================================================
-Scan file: scan-2026-07-07.csv
-Total records: 16662
-============================================================
-
-Host state (reachable vs unreachable)
-------------------------------------------------------------
-  reachable             10625   63.8%  [###################-----------]
-  unreachable            6037   36.2%  [##########--------------------]
-
-OS class among reachable nodes (n=10625)
-------------------------------------------------------------
-  Linux                  6653   62.6%  [##################------------]
-  Unknown                2852   26.8%  [########----------------------]
-  Windows                 453    4.3%  [#-----------------------------]
-  Other/Device            370    3.5%  [#-----------------------------]
-  BSD                     194    1.8%  [------------------------------]
-  macOS                    95    0.9%  [------------------------------]
-  Other                     6    0.1%  [------------------------------]
-  Solaris                   2    0.0%  [------------------------------]
-
-Accuracy by OS class (reachable nodes with a guess)
-------------------------------------------------------------
-  Linux                n=6653  min=72   avg= 94.6  max=100
-  Windows              n=453   min=79   avg= 90.9  max=100
-  Other/Device         n=370   min=85   avg= 91.1  max=100
-  BSD                  n=194   min=85   avg= 90.1  max=100
-  macOS                n=95    min=85   avg= 90.2  max=100
-  Unknown              n=24    min=6    avg= 46.6  max=69
-  Other                n=6     min=90   avg= 94.8  max=100
-  Solaris              n=2     min=87   avg= 88.0  max=89
-
-Legend
-------------------------------------------------------------
-  Unknown: nmap had no OS guess, or the guess scored below 70% accuracy.
-  Other/Device: guess matched a router/firewall/printer/appliance or similar, likely a middlebox in front of the node rather than the node itself.
-  Other: guess matched an OS outside the tracked classes (Linux, BSD, Windows, macOS, Solaris).
-```
-
-These two runs are one day apart, against independently-fetched Bitnodes
-exports, and every OS class lands within about a percentage point of the
-other run (reachable ratio 64.1% vs 63.8%, Linux 62.7% vs 62.6%, Windows
-4.3% vs 4.3%, and so on). That's the expected outcome: individual hosts can
-flip classification between runs (see the Synology example above), but the
-aggregate distribution is stable, which is what makes it usable as a
-statistic in the first place.
+This is the first scan run with the single-port method (see above) and
+nmap version 7.99, which is why `Unknown` drops sharply (26.8% → 18.6%) and
+`Linux` rises (62.6% → 70.9%) compared to the two legacy runs: those runs
+were suppressing correct matches by mixing in a middlebox's TCP/IP behavior
+via the reference port. It isn't directly comparable to the two legacy runs
+above for that reason, future single-port scans should be compared against
+this one instead.
 
 That stability is also the reason **not** to run this scan daily, or on any
 tight recurring schedule. A one-off or occasional scan is enough to get a
@@ -167,7 +143,7 @@ only when you actually need a fresh snapshot, not on a cron job.
 
 ## Scan responsibly
 
-`os_fingerprint.py` doesn't just read data, it actively sends crafted TCP and UDP 
+`os_fingerprint.py` doesn't just read data, it actively [sends crafted TCP, UDP and ICMP](https://nmap.org/book/osdetect-methods.html)
 packets to every host in your target list. Used carelessly this is indistinguishable
 from noisy/abusive scanning traffic and can trip IDS/abuse alerts, get your
 scanning IP blocklisted, or in aggregate put load on hosts and networks that
