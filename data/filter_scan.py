@@ -15,10 +15,17 @@ DEVICE_KEYWORDS = [
     "check point", "sonicos", "cisco", "juniper", "netgear", "asus",
     "d-link", "tp-link", "zyxel", "aruba", "aerohive", "mikrotik",
     "ubiquiti", "sonos", "xbox", "blu-ray", "iphone", "apple ios",
-    "micropython", "monitor", "android",
+    "micropython", "monitor", "storage array", "netapp", "voip",
+    "mobile phone", "google home", "ibm i", "datalogger",
 ]
 
+DEVICE_KEYWORD_PATTERN = re.compile(
+    r"\b(" + "|".join(re.escape(keyword) for keyword in DEVICE_KEYWORDS) + r")\b",
+    re.I,
+)
+
 OS_CLASS_PATTERNS = [
+    ("Android", re.compile(r"\bandroid\b", re.I)),
     ("Linux", re.compile(r"\blinux\b", re.I)),
     ("BSD", re.compile(r"\b(free|open|net)bsd\b", re.I)),
     ("Windows", re.compile(r"\bwindows\b", re.I)),
@@ -31,8 +38,7 @@ def classify(os_name: str) -> str:
     if not os_name:
         return "Unknown"
 
-    name_lower = os_name.lower()
-    if any(keyword in name_lower for keyword in DEVICE_KEYWORDS):
+    if DEVICE_KEYWORD_PATTERN.search(os_name):
         return "Other/Device"
 
     for label, pattern in OS_CLASS_PATTERNS:

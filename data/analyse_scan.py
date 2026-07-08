@@ -19,8 +19,8 @@ OS_CLASS_LEGEND = {
     "Unknown": "nmap had no OS guess, or the guess scored below 70% accuracy.",
     "Other/Device": "guess matched a router/firewall/printer/appliance or similar, "
                      "likely a middlebox in front of the node rather than the node itself.",
-    "Other": "guess matched an OS outside the tracked classes (Linux, BSD, Windows, "
-             "macOS, Solaris).",
+    "Other": "guess matched an OS outside the tracked classes (Linux, Android, BSD, "
+             "Windows, macOS, Solaris).",
 }
 
 
