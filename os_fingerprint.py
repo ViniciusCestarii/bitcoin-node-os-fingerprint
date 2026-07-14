@@ -28,7 +28,7 @@ def group_by_port(csv_file):
 
 def run_nmap(ip, port, host_timeout, ipv6=False):
     cmd = [
-        "sudo", "nmap", "-O", "--osscan-guess", "-T4",
+        "nmap", "-O", "--osscan-guess", "-T4",
         "-PS" + str(port),
         "--host-timeout", host_timeout,
         "-p", port, "-oX", "-", ip,

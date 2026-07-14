@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+README.md
+CHANGELOG.md
+scripts/*
+data/raw-scan*
+data/bitcoin_nodes-*.csv
