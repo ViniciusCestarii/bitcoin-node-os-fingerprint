@@ -26,6 +26,14 @@ def group_by_port(csv_file):
     return groups
 
 
+def host_timeout_seconds(host_timeout):
+    units = {"ms": 1 / 1000, "s": 1, "m": 60, "h": 3600}
+    for suffix, factor in units.items():
+        if host_timeout.endswith(suffix):
+            return float(host_timeout[: -len(suffix)]) * factor
+    return float(host_timeout) / 1000  # bare number means milliseconds to nmap
+
+
 def run_nmap(ip, port, host_timeout, ipv6=False):
     cmd = [
         "nmap", "-O", "--osscan-guess", "-T4",
@@ -35,9 +43,15 @@ def run_nmap(ip, port, host_timeout, ipv6=False):
     ]
     if ipv6:
         cmd.insert(2, "-6")
-        cmd.append("--send-eth")
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
-    return result.stdout
+    try:
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True,
+            timeout=host_timeout_seconds(host_timeout) + 30, # timeout for hanging command
+        )
+        return result.stdout
+    except subprocess.TimeoutExpired:
+        print(f"[{ip}:{port}] nmap hard-killed after hanging past timeout")
+        return ""
 
 
 def extraports_state(host):
@@ -55,7 +69,11 @@ def xml_to_row(xml_output, ip, port):
     if not xml_output.strip():
         return [ip, port, "", "", "no-response", "", ""]
 
-    root = ET.fromstring(xml_output)
+    try:
+        root = ET.fromstring(xml_output)
+    except ET.ParseError as e:
+        print(f"[{ip}:{port}] failed to parse nmap XML output: {e}")
+        return [ip, port, "", "", "parse-error", "", ""]
     host = root.find("host")
     if host is None:
         return [ip, port, "", "", "down", "", ""]
