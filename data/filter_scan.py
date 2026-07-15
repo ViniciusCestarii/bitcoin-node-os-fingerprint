@@ -16,7 +16,8 @@ DEVICE_KEYWORDS = [
     "d-link", "tp-link", "zyxel", "aruba", "aerohive", "mikrotik",
     "ubiquiti", "sonos", "xbox", "blu-ray", "iphone", "apple ios",
     "micropython", "monitor", "storage array", "netapp", "voip",
-    "mobile phone", "google home", "ibm i", "datalogger",
+    "mobile phone", "google home", "ibm i", "datalogger", "extreme networks extremeos",
+    "lancom lcos"
 ]
 
 DEVICE_KEYWORD_PATTERN = re.compile(
