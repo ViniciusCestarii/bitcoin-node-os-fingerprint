@@ -61,8 +61,7 @@ Windows, macOS, Android, Solaris, etc.) for statistics.
 
 ## Data
 
-Scan output and the processing scripts live in [`data/`](data). See that
-directory for the CSV, and the scripts that produce them.
+Scan output and the processing scripts live in [`data/`](data).
 
 ## Analysis
 
