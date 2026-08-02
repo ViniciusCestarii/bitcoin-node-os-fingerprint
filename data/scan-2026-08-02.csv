@@ -17431,7 +17431,7 @@ ip_address,port,os_class,accuracy,host_state
 240e:352:1b95:d200:80ec:ac1d:fa9f:b1e2,8333,Unknown,,unreachable
 2604:a880:cad:d0::ef4:a001,8333,Linux,86,reachable
 2a01:4f8:151:7483::2,8333,Linux,97,reachable
-2a05:d018:a75:6c00:9927:bcb5:f823:93ba,8333,Unknown,,no-response
+2a05:d018:a75:6c00:9927:bcb5:f823:93ba,8333,Unknown,,timeout
 2600:8800:2b8d:ec14::1,8333,Unknown,,unreachable
 2001:fb1:18c:daef:3846:e2f7:d7b5:bc01,8333,Unknown,,unreachable
 2001:b011:2009:13b8:241f:69e7:e35d:86a4,8333,Unknown,,unreachable
@@ -17849,7 +17849,7 @@ ip_address,port,os_class,accuracy,host_state
 2804:53e0:931d:cf00:d551:3a01:eacb:333c,8333,Unknown,,unreachable
 2600:4040:9eef:5000:a0d7:1ca1:9bfa:81ed,8333,Unknown,,unreachable
 2408:8234:616:1185:8943:de7d:f856:f148,8333,Unknown,,unreachable
-2409:8a00:2495:c730:f178:eeb4:e150:bc92,8333,Unknown,,no-response
+2409:8a00:2495:c730:f178:eeb4:e150:bc92,8333,Unknown,,timeout
 2a00:23c7:8583:8301:8aa2:9eff:fe22:be11,8333,Unknown,,reachable
 2603:300a:912:627a:be24:11ff:fe7b:39c3,8333,Unknown,,reachable
 2001:41d0:403:1eaf::1,8333,Linux,81,reachable
@@ -21171,7 +21171,7 @@ ip_address,port,os_class,accuracy,host_state
 46.62.195.157,64683,Linux,94,reachable
 47.151.151.80,60146,Linux,87,reachable
 5.9.152.90,11010,Android,91,reachable
-2409:8a00:79a1:3230::558,2011,Unknown,,no-response
+2409:8a00:79a1:3230::558,2011,Unknown,,timeout
 75.128.28.25,7335,Linux,92,reachable
 82.78.238.57,11010,Other/Device,93,reachable
 51.15.187.145,7907,Linux,100,reachable

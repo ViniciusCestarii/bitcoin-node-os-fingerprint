@@ -61,7 +61,24 @@ Windows, macOS, Android, Solaris, etc.) for statistics.
 
 ## Data
 
-Scan output and the processing scripts live in [`data/`](data).
+Scan output and the processing scripts live in [`data/`](data). The published
+`scan-*.csv` files have five columns:
+
+| column | values |
+| --- | --- |
+| `ip_address` | IPv4 or IPv6 address of the scanned host |
+| `port` | port the node was advertised on |
+| `os_class` | `Linux`, `Android`, `BSD`, `Windows`, `macOS`, `Solaris`, `Other/Device`, `Other`, or `Unknown` |
+| `accuracy` | nmap's confidence in its raw guess, 0-100, empty when there was no guess |
+| `host_state` | `reachable`, `unreachable`, or `timeout` |
+
+`accuracy` describes the specific version guess nmap made before it was
+generalised into `os_class`, and is kept even for rows downgraded to
+`Unknown`, so a low value there is the reason for the downgrade rather than a
+contradiction.
+
+`timeout` isn't `unreachable`: nmap was killed before reporting anything, so
+the host was never measured. Exclude those rows from reachability ratios.
 
 ## Analysis
 

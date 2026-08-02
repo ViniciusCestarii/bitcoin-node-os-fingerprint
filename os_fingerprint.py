@@ -67,7 +67,7 @@ def extraports_state(host):
 
 def xml_to_row(xml_output, ip, port):
     if not xml_output.strip():
-        return [ip, port, "", "", "no-response", "", ""]
+        return [ip, port, "", "", "timeout", "", ""]
 
     try:
         root = ET.fromstring(xml_output)

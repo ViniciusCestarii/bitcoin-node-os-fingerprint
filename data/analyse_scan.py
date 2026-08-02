@@ -15,6 +15,11 @@ def print_bar(label: str, count: int, total: int, width: int = 30) -> None:
     print(f"  {label:<20} {count:>6}  {pct:5.1f}%  [{bar}]")
 
 
+HOST_STATE_LEGEND = {
+    "timeout": "nmap hung past its own host timeout and was killed before it "
+               "reported anything, so the host was never measured at all."
+}
+
 OS_CLASS_LEGEND = {
     "Unknown": "nmap had no OS guess, or the guess scored below 70% accuracy.",
     "Other/Device": "guess matched a router/firewall/printer/appliance or similar, "
@@ -24,9 +29,13 @@ OS_CLASS_LEGEND = {
 }
 
 
-def print_legend() -> None:
+def print_legend(host_states) -> None:
     print("\nLegend")
     print("-" * 60)
+    # only worth explaining a host state the scan actually produced
+    for label, meaning in HOST_STATE_LEGEND.items():
+        if label in host_states:
+            print(f"  {label}: {meaning}")
     for label, meaning in OS_CLASS_LEGEND.items():
         print(f"  {label}: {meaning}")
 
@@ -55,7 +64,7 @@ def main():
     print(f"Total records: {total}")
     print("=" * 60)
 
-    print("\nHost state (reachable vs unreachable)")
+    print("\nHost state")
     print("-" * 60)
     for state in sorted(host_states, key=host_states.get, reverse=True):
         print_bar(state, host_states[state], total)
@@ -72,7 +81,7 @@ def main():
         avg = sum(values) / len(values)
         print(f"  {label:<20} n={len(values):<5} min={min(values):<4} avg={avg:5.1f}  max={max(values)}")
 
-    print_legend()
+    print_legend(host_states)
     print()
 
 
