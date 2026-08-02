@@ -17,7 +17,7 @@ DEVICE_KEYWORDS = [
     "ubiquiti", "sonos", "xbox", "blu-ray", "iphone", "apple ios",
     "micropython", "monitor", "storage array", "netapp", "voip",
     "mobile phone", "google home", "ibm i", "datalogger", "extreme networks extremeos",
-    "lancom lcos"
+    "lancom lcos", "vmware esxi"
 ]
 
 DEVICE_KEYWORD_PATTERN = re.compile(
