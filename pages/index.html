@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OS Fingerprinting of Bitcoin Nodes</title>
-<meta name="description" content="Operating system distribution of publicly reachable Bitcoin nodes, from monthly nmap scans.">
+<meta name="description" content="Operating system distribution of publicly reachable Bitcoin nodes on IPv4 and IPv6, from monthly nmap scans.">
 <style>
   :root {
     color-scheme: light;
@@ -218,8 +218,9 @@
     <div>
       <h1>OS Fingerprinting of Bitcoin Nodes</h1>
       <p class="sub">
-        Operating system guesses for publicly reachable Bitcoin nodes, from
-        monthly <code>nmap</code> scans. One scan per month, loaded straight from
+        Operating system guesses for publicly reachable Bitcoin nodes,
+        <strong>IPv4 and IPv6 only</strong> (no Tor, I2P or CJDNS), from monthly
+        <code>nmap</code> scans. One scan per month, loaded straight from
         <a href="https://github.com/ViniciusCestarii/bitcoin-node-os-fingerprint/tree/master/data">the dataset on GitHub</a>.
       </p>
     </div>
@@ -237,6 +238,11 @@
       accuracy are downgraded to <em>Unknown</em>, and individual hosts can flip
       class between runs. Per-class proportions are the reliable signal, not any
       single row.
+    </p>
+    <p>
+      Only IPv4 and IPv6 hosts are scanned: they are the only address families
+      Bitcoin supports that map cleanly to the machine actually running the
+      node, so Tor, I2P and CJDNS peers are absent from every number here.
     </p>
     <p>
       Legacy two-port scans are excluded. <code>timeout</code> rows are not
