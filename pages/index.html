@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OS Fingerprinting of Bitcoin Nodes</title>
+<meta name="description" content="Operating system distribution of publicly reachable Bitcoin nodes, from monthly nmap scans.">
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --plane: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --hover: rgba(11, 11, 11, 0.04);
+
+    /* categorical slots, fixed order (validated adjacent-pair) */
+    --os-0: #2a78d6;  /* Linux        - blue */
+    --os-1: #898781;  /* Unknown      - neutral, "no answer" */
+    --os-2: #eb6834;  /* Windows      - orange */
+    --os-3: #1baf7a;  /* Other/Device - aqua */
+    --os-4: #eda100;  /* BSD          - yellow */
+    --os-5: #e87ba4;  /* macOS        - magenta */
+    --os-6: #008300;  /* Android      - green */
+    --os-7: #4a3aa7;  /* Solaris      - violet */
+    --os-8: #e34948;  /* Other        - red */
+
+    /* host state = state, so status palette (never reused for a series) */
+    --st-reachable: #0ca30c;
+    --st-unreachable: #898781;
+    --st-timeout: #fab219;
+
+    --good-text: #006300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --plane: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --hover: rgba(255, 255, 255, 0.06);
+      --os-0: #3987e5;
+      --os-1: #898781;
+      --os-2: #d95926;
+      --os-3: #199e70;
+      --os-4: #c98500;
+      --os-5: #d55181;
+      --os-6: #008300;
+      --os-7: #9085e9;
+      --os-8: #e66767;
+      --good-text: #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --plane: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --hover: rgba(255, 255, 255, 0.06);
+    --os-0: #3987e5;
+    --os-1: #898781;
+    --os-2: #d95926;
+    --os-3: #199e70;
+    --os-4: #c98500;
+    --os-5: #d55181;
+    --os-6: #008300;
+    --os-7: #9085e9;
+    --os-8: #e66767;
+    --good-text: #0ca30c;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 72px; }
+
+  header.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); margin: 0; max-width: 62ch; }
+  .btn {
+    font: inherit; font-size: 13px; color: var(--text-secondary);
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer; min-height: 34px;
+  }
+  .btn:hover { background: var(--hover); }
+  .btn:focus-visible { outline: 2px solid var(--os-0); outline-offset: 2px; }
+
+  /* one filter row above everything it scopes */
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin: 28px 0 20px; padding: 12px 14px;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .filters label { font-size: 13px; color: var(--text-secondary); }
+  select {
+    font: inherit; font-size: 14px; color: var(--text-primary);
+    background: var(--plane); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; min-height: 34px;
+  }
+  .filters .note { font-size: 12.5px; color: var(--text-muted); margin-left: auto; }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 20px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 2px; letter-spacing: -0.005em; }
+  .card .cap { font-size: 12.5px; color: var(--text-muted); margin: 0 0 18px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .tile { background: var(--plane); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .tile .label { font-size: 13px; color: var(--text-secondary); }
+  .tile .value { font-size: 32px; font-weight: 600; letter-spacing: -0.015em; margin-top: 2px; line-height: 1.15; }
+  .tile .delta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+  /* horizontal bars */
+  .hbars { display: grid; grid-template-columns: max-content 1fr max-content; gap: 10px 12px; align-items: center; }
+  .hbars .name { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .track { position: relative; height: 18px; }
+  .track::before { content: ""; position: absolute; inset: 0; border-radius: 3px; background: var(--grid); opacity: .45; }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; min-width: 2px; }
+  .hbars .val { font-size: 13px; color: var(--text-primary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hbars .val .n { color: var(--text-muted); font-size: 12px; margin-left: 6px; }
+  .hrow { display: contents; }
+
+  /* stacked columns */
+  .chart-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 16px; }
+  .chart-head .cap { flex: 1 1 260px; }
+  .modes { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 18px; }
+  .mode-btn {
+    font: inherit; font-size: 12.5px; color: var(--text-secondary); background: none;
+    border: 0; border-radius: 6px; padding: 5px 11px; cursor: pointer; min-height: 28px;
+  }
+  .mode-btn:hover { background: var(--hover); }
+  .mode-btn.on { background: var(--plane); color: var(--text-primary); font-weight: 600; box-shadow: inset 0 0 0 1px var(--border); }
+  .mode-btn:focus-visible { outline: 2px solid var(--os-0); outline-offset: 1px; }
+  .coltotal { position: absolute; left: 0; right: 0; font-size: 11.5px; color: var(--text-secondary); text-align: center; font-variant-numeric: tabular-nums; }
+  /* headroom so the top tick label and the column totals are not clipped by
+     the horizontal scroll container (overflow-x:auto also clips y) */
+  .plot { position: relative; padding: 22px 0 0 54px; }
+  .cols { display: flex; align-items: flex-end; gap: 20px; height: 280px; position: relative; }
+  .colwrap { position: relative; flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; max-width: 120px; min-width: 46px; }
+  .stack { display: flex; flex-direction: column; gap: 2px; height: 100%; }
+  .seg { position: relative; min-height: 2px; display: flex; align-items: center; justify-content: center; }
+  .seg:first-child { border-radius: 4px 4px 0 0; }
+  .seg:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 1px; }
+  .seg-label { font-size: 12px; font-weight: 600; padding: 0 6px; white-space: nowrap; color: #ffffff; }
+  .gridlines { position: absolute; inset: 22px 0 0 0; pointer-events: none; }
+  .gline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); }
+  .gline span { position: absolute; left: 0; top: -8px; font-size: 11px; color: var(--text-muted); background: var(--surface-1); padding-right: 6px; font-variant-numeric: tabular-nums; }
+  .xaxis { display: flex; gap: 20px; margin: 8px 0 0 54px; border-top: 1px solid var(--axis); padding-top: 8px; }
+  .xtick { flex: 1 1 0; max-width: 120px; min-width: 46px; font-size: 12.5px; color: var(--text-secondary); text-align: center; }
+  .xtick small { display: block; color: var(--text-muted); font-size: 11.5px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 16px; }
+  .legend-toggle, .legend-reset {
+    display: flex; align-items: center; gap: 7px; font: inherit; font-size: 12.5px;
+    color: var(--text-secondary); background: none; border: 1px solid transparent;
+    border-radius: 999px; padding: 4px 10px; cursor: pointer; min-height: 26px;
+  }
+  .legend-toggle:hover, .legend-reset:hover { background: var(--hover); }
+  .legend-toggle:focus-visible, .legend-reset:focus-visible { outline: 2px solid var(--os-0); outline-offset: 1px; }
+  .legend-toggle.off { color: var(--text-muted); text-decoration: line-through; }
+  .legend-toggle.off .swatch { opacity: .3; }
+  .legend-reset { border-color: var(--border); color: var(--text-primary); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+  thead th { color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--axis); }
+  .scroll-x { overflow-x: auto; }
+  #tableview[hidden] { display: none; }
+
+  .tooltip {
+    position: fixed; z-index: 20; pointer-events: none; opacity: 0;
+    transition: opacity .1s ease; background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    font-size: 12.5px; color: var(--text-primary); max-width: 260px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.14);
+  }
+  .tooltip .t-title { font-weight: 600; margin-bottom: 3px; display: flex; align-items: center; gap: 7px; }
+  .tooltip .t-row { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  [data-tip] { cursor: default; }
+  [data-tip]:focus-visible { outline: 2px solid var(--os-0); outline-offset: 1px; }
+
+  .msg { padding: 28px 20px; text-align: center; color: var(--text-secondary); }
+  .msg .btn { margin-top: 12px; }
+  .loading { opacity: .55; }
+  footer { color: var(--text-muted); font-size: 12.5px; margin-top: 32px; }
+  footer p { margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>OS Fingerprinting of Bitcoin Nodes</h1>
+      <p class="sub">
+        Operating system guesses for publicly reachable Bitcoin nodes, from
+        monthly <code>nmap</code> scans. One scan per month, loaded straight from
+        <a href="https://github.com/ViniciusCestarii/bitcoin-node-os-fingerprint/tree/master/data">the dataset on GitHub</a>.
+      </p>
+    </div>
+    <button class="btn" id="theme-toggle" type="button">Dark mode</button>
+  </header>
+
+  <div id="app" aria-live="polite">
+    <div class="card msg" id="boot">Loading scans from GitHub…</div>
+  </div>
+
+  <footer>
+    <p>
+      nmap's OS detection is a best-effort guess, not a fact. A fingerprint can
+      describe a firewall or NAT device in front of the node, guesses below 70%
+      accuracy are downgraded to <em>Unknown</em>, and individual hosts can flip
+      class between runs. Per-class proportions are the reliable signal, not any
+      single row.
+    </p>
+    <p>
+      Legacy two-port scans are excluded. <code>timeout</code> rows are not
+      <code>unreachable</code>: nmap was killed before reporting, so those hosts
+      were never measured, and they are left out of the reachability ratio.
+      See the <a href="https://github.com/ViniciusCestarii/bitcoin-node-os-fingerprint#readme">README</a> for full methodology limitations.
+    </p>
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip" role="status" aria-live="off"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const REPO = "ViniciusCestarii/bitcoin-node-os-fingerprint";
+  const DATA_DIR = "data";
+  // scan-YYYY-MM-DD.csv only; the "-legacy" suffixed files never match.
+  const SCAN_RE = /^scan-(\d{4})-(\d{2})-(\d{2})\.csv$/;
+
+  const OS_ORDER = ["Linux", "Unknown", "Windows", "Other/Device", "BSD", "macOS", "Android", "Solaris", "Other"];
+  const OS_COLOR = Object.fromEntries(OS_ORDER.map((c, i) => [c, `var(--os-${i})`]));
+  const STATE_ORDER = ["reachable", "unreachable", "timeout"];
+  const STATE_COLOR = {
+    reachable: "var(--st-reachable)",
+    unreachable: "var(--st-unreachable)",
+    timeout: "var(--st-timeout)"
+  };
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const app = document.getElementById("app");
+  const tooltip = document.getElementById("tooltip");
+
+  /* ---------- theme ---------- */
+  const themeBtn = document.getElementById("theme-toggle");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const isDark = () => {
+    const t = document.documentElement.dataset.theme;
+    return t ? t === "dark" : prefersDark.matches;
+  };
+  const syncThemeBtn = () => { themeBtn.textContent = isDark() ? "Light mode" : "Dark mode"; };
+  themeBtn.addEventListener("click", () => {
+    document.documentElement.dataset.theme = isDark() ? "light" : "dark";
+    syncThemeBtn();
+  });
+  prefersDark.addEventListener("change", syncThemeBtn);
+  syncThemeBtn();
+
+  /* ---------- helpers ---------- */
+  const el = (tag, props = {}, kids = []) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k === "html") n.innerHTML = v;
+      else if (k === "style") n.setAttribute("style", v);
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else if (v !== null && v !== undefined && v !== false) n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of [].concat(kids)) if (kid) n.append(kid);
+    return n;
+  };
+  const num = (n) => n.toLocaleString("en-US");
+  const pct = (part, total, digits = 1) => total ? (part / total * 100).toFixed(digits) + "%" : "0%";
+  const pctNum = (part, total) => total ? part / total * 100 : 0;
+  const monthLabel = (key) => {
+    const [y, m] = key.split("-");
+    return `${MONTHS[Number(m) - 1]} ${y}`;
+  };
+
+  /* ---------- tooltip layer ---------- */
+  const showTip = (target, html) => {
+    tooltip.innerHTML = html;
+    tooltip.style.opacity = "1";
+    const r = target.getBoundingClientRect();
+    const t = tooltip.getBoundingClientRect();
+    let left = r.left + r.width / 2 - t.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - t.width - 8));
+    let top = r.top - t.height - 8;
+    if (top < 8) top = r.bottom + 8;
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+  };
+  const hideTip = () => { tooltip.style.opacity = "0"; };
+  // hover and keyboard focus reveal the same content
+  const tip = (node, html) => {
+    node.tabIndex = 0;
+    node.setAttribute("data-tip", "");
+    node.addEventListener("mouseenter", () => showTip(node, html));
+    node.addEventListener("focus", () => showTip(node, html));
+    node.addEventListener("mouseleave", hideTip);
+    node.addEventListener("blur", hideTip);
+    return node;
+  };
+  window.addEventListener("scroll", hideTip, { passive: true });
+
+  /* ---------- data ---------- */
+  function parseCsv(text) {
+    const lines = text.split("\n");
+    const head = lines[0].replace(/\r$/, "").split(",");
+    const idx = {
+      os_class: head.indexOf("os_class"),
+      accuracy: head.indexOf("accuracy"),
+      host_state: head.indexOf("host_state")
+    };
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].replace(/\r$/, "");
+      if (!line) continue;
+      const f = line.split(",");
+      rows.push({
+        os_class: f[idx.os_class] || "Unknown",
+        accuracy: f[idx.accuracy] === "" || f[idx.accuracy] === undefined ? null : Number(f[idx.accuracy]),
+        host_state: f[idx.host_state] || "unreachable"
+      });
+    }
+    return rows;
+  }
+
+  function aggregate(rows) {
+    const state = Object.fromEntries(STATE_ORDER.map((s) => [s, 0]));
+    const os = Object.fromEntries(OS_ORDER.map((c) => [c, 0]));
+    const acc = Object.fromEntries(OS_ORDER.map((c) => [c, { n: 0, sum: 0, min: Infinity, max: -Infinity }]));
+    for (const r of rows) {
+      if (state[r.host_state] === undefined) state[r.host_state] = 0;
+      state[r.host_state]++;
+      if (r.host_state !== "reachable") continue;
+      const cls = os[r.os_class] === undefined ? "Other" : r.os_class;
+      os[cls]++;
+      if (r.accuracy !== null && !Number.isNaN(r.accuracy)) {
+        const a = acc[cls];
+        a.n++; a.sum += r.accuracy;
+        a.min = Math.min(a.min, r.accuracy);
+        a.max = Math.max(a.max, r.accuracy);
+      }
+    }
+    const measured = state.reachable + state.unreachable;
+    return { total: rows.length, state, measured, reachable: state.reachable, os, acc };
+  }
+
+  async function loadScans() {
+    const listUrl = `https://api.github.com/repos/${REPO}/contents/${DATA_DIR}`;
+    const res = await fetch(listUrl, { headers: { Accept: "application/vnd.github+json" } });
+    if (!res.ok) {
+      throw new Error(
+        res.status === 403
+          ? "GitHub's API rate limit for this IP was hit (60 requests/hour, unauthenticated). Try again in a few minutes."
+          : `GitHub API returned ${res.status} ${res.statusText}.`
+      );
+    }
+    const files = await res.json();
+
+    // one scan per month: the latest day in each month wins
+    const byMonth = new Map();
+    for (const f of files) {
+      const m = SCAN_RE.exec(f.name);
+      if (!m || f.type !== "file") continue;
+      const key = `${m[1]}-${m[2]}`;
+      const prev = byMonth.get(key);
+      if (!prev || f.name > prev.name) {
+        byMonth.set(key, { key, name: f.name, date: `${m[1]}-${m[2]}-${m[3]}`, url: f.download_url, size: f.size });
+      }
+    }
+    if (!byMonth.size) throw new Error("No scan-YYYY-MM-DD.csv files found in the repository's data/ directory.");
+
+    const picked = [...byMonth.values()].sort((a, b) => a.date.localeCompare(b.date));
+    return Promise.all(picked.map(async (s) => {
+      const r = await fetch(s.url);
+      if (!r.ok) throw new Error(`Could not download ${s.name} (${r.status}).`);
+      return Object.assign({}, s, { stats: aggregate(parseCsv(await r.text())) });
+    }));
+  }
+
+  /* ---------- chart builders ---------- */
+
+  // Horizontal bars, one color per entity (identity, not rank).
+  function hbars(items, { max, colorOf, format, tipOf }) {
+    const grid = el("div", { class: "hbars" });
+    for (const it of items) {
+      const width = max ? Math.max(0, it.value / max * 100) : 0;
+      const fill = el("div", { class: "fill", style: `width:${width}%;background:${colorOf(it)}` });
+      const track = el("div", { class: "track" }, [fill]);
+      tip(track, tipOf(it));
+      grid.append(
+        el("div", { class: "name" }, [
+          el("span", { class: "swatch", style: `background:${colorOf(it)}` }),
+          el("span", { text: it.label })
+        ]),
+        track,
+        el("div", { class: "val", html: format(it) })
+      );
+    }
+    return grid;
+  }
+
+  // 100% stacked columns; segments follow the fixed order and are separated by
+  // a 2px surface gap. Segments share the column height via flex-grow, so the
+  // gaps come out of the available height instead of pushing the stack past 100%.
+  // Legend entries are toggles: hiding a class drops it from the denominator, so
+  // the remaining classes still fill the column and stay comparable month to
+  // month. Colors are pinned to the class, so survivors are never repainted.
+  function stackedChart(scans, { order, colorOf, valueOf, labelPrimary, unit, caption, legendNoun }) {
+    const hidden = new Set();
+    const visible = () => order.filter((k) => !hidden.has(k));
+    let mode = "share"; // "share" = each column normalised to 100%, "count" = raw totals on a shared axis
+    const block = el("div");
+    const note = el("p", { class: "cap" });
+    const modes = el("div", { class: "modes", role: "group", "aria-label": "Value scale" });
+    const body = el("div");
+    const legendEl = el("div", { class: "legend" });
+
+    // a y-axis ceiling that lands on 4 clean ticks
+    const niceAxis = (max) => {
+      if (max <= 0) return 4;
+      const rough = max / 4;
+      const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+      for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 7.5, 10]) {
+        const step = m * mag;
+        if (step * 4 >= max) return step * 4;
+      }
+      return 10 * mag * 4;
+    };
+
+    const drawBody = () => {
+      const shown = visible();
+      const totals = scans.map((s) => shown.reduce((sum, k) => sum + valueOf(s, k), 0));
+      const axisMax = mode === "count" ? niceAxis(Math.max(...totals)) : 100;
+
+      const plot = el("div", { class: "plot" });
+      const gridlines = el("div", { class: "gridlines" });
+      for (const g of [0, 25, 50, 75, 100]) {
+        const label = mode === "count" ? num(Math.round(axisMax * g / 100)) : g + "%";
+        gridlines.append(el("div", { class: "gline", style: `bottom:${g}%` }, [el("span", { text: label })]));
+      }
+
+      const cols = el("div", { class: "cols" });
+      scans.forEach((scan, ci) => {
+        const total = totals[ci];
+        // in count mode the column height carries the total, so growth is visible
+        const colHeight = mode === "count" ? pctNum(total, axisMax) : 100;
+        const stack = el("div", { class: "stack", style: `height:${colHeight}%` });
+        for (const key of shown) {
+          const v = valueOf(scan, key);
+          if (!v) continue;
+          const share = pctNum(v, total);
+          const seg = el("div", { class: "seg", style: `flex:${share} 1 0;background:${colorOf(key)}` });
+          // only label inside the segment when it comfortably fits
+          if (key === labelPrimary && share > 14 && (mode === "share" || pctNum(v, axisMax) > 8)) {
+            seg.append(el("span", {
+              class: "seg-label",
+              text: mode === "count" ? num(v) : share.toFixed(1) + "%"
+            }));
+          }
+          tip(seg, `<div class="t-title"><span class="swatch" style="display:inline-block;background:${colorOf(key)}"></span>${key}</div>
+                    <div class="t-row">${num(v)} ${unit} · ${pct(v, total)}${hidden.size ? " of shown" : ""}</div>
+                    <div class="t-row">${monthLabel(scan.key)} · ${scan.date}</div>`);
+          stack.append(seg);
+        }
+        const wrap = el("div", { class: "colwrap" }, [stack]);
+        if (mode === "count") {
+          // floats just above the column instead of taking layout space,
+          // so the label can never squeeze the stack it belongs to
+          wrap.append(el("div", {
+            class: "coltotal",
+            style: `bottom:calc(${colHeight}% + 5px)`,
+            text: num(total)
+          }));
+        }
+        cols.append(wrap);
+      });
+      plot.append(gridlines, cols);
+
+      const axis = el("div", { class: "xaxis" });
+      for (const scan of scans) {
+        axis.append(el("div", { class: "xtick" }, [
+          el("span", { text: monthLabel(scan.key) }),
+          el("small", { text: scan.date.slice(5) })
+        ]));
+      }
+      body.replaceChildren(el("div", { class: "scroll-x" }, [plot, axis]));
+
+      const scaleNote = mode === "count"
+        ? `, as ${unit} counted`
+        : (hidden.size ? `, rescaled to the ${shown.length} still shown` : "");
+      note.textContent = caption + scaleNote
+        + (hidden.size ? ` (hidden: ${[...hidden].join(", ")})` : "")
+        + `. Click ${legendNoun} below to hide it`;
+      hideTip();
+    };
+
+    const drawModes = () => {
+      modes.replaceChildren();
+      for (const [key, label] of [["share", "Share %"], ["count", `${unit[0].toUpperCase()}${unit.slice(1)}`]]) {
+        const b = el("button", {
+          class: "mode-btn" + (mode === key ? " on" : ""),
+          type: "button", "aria-pressed": mode === key ? "true" : "false", text: label
+        });
+        b.addEventListener("click", () => {
+          if (mode === key) return;
+          mode = key;
+          drawBody();
+          drawModes();
+        });
+        modes.append(b);
+      }
+    };
+
+    const drawLegend = () => {
+      legendEl.replaceChildren();
+      for (const k of order) {
+        const off = hidden.has(k);
+        const btn = el("button", {
+          class: "legend-toggle" + (off ? " off" : ""),
+          type: "button",
+          "aria-pressed": off ? "false" : "true",
+          title: off ? `Show ${k}` : `Hide ${k}`
+        }, [
+          el("span", { class: "swatch", style: `background:${colorOf(k)}` }),
+          el("span", { text: k })
+        ]);
+        btn.addEventListener("click", () => {
+          // never let the last visible class be switched off
+          if (!hidden.has(k) && visible().length === 1) return;
+          if (hidden.has(k)) hidden.delete(k); else hidden.add(k);
+          drawBody();
+          drawLegend();
+        });
+        legendEl.append(btn);
+      }
+      const reset = el("button", { class: "legend-reset", type: "button", text: "Show all" });
+      reset.addEventListener("click", () => { hidden.clear(); drawBody(); drawLegend(); });
+      if (hidden.size) legendEl.append(reset);
+    };
+
+    drawBody();
+    drawLegend();
+    drawModes();
+    block.append(el("div", { class: "chart-head" }, [note, modes]), body, legendEl);
+    return block;
+  }
+
+  /* ---------- render ---------- */
+  function render(scans, selectedKey) {
+    const scan = scans.find((s) => s.key === selectedKey) || scans[scans.length - 1];
+    const prev = scans[scans.indexOf(scan) - 1] || null;
+    const st = scan.stats;
+
+    const frag = document.createDocumentFragment();
+
+    /* filter row */
+    const select = el("select", { id: "scan-select", "aria-label": "Scan month" });
+    for (const s of scans) {
+      select.append(el("option", { value: s.key, selected: s.key === scan.key, text: `${monthLabel(s.key)} (${s.date})` }));
+    }
+    select.addEventListener("change", () => render(scans, select.value));
+    frag.append(el("div", { class: "filters" }, [
+      el("label", { for: "scan-select", text: "Scan month" }),
+      select,
+      el("span", { class: "note", text: `${scans.length} monthly scan${scans.length === 1 ? "" : "s"} · one per month, latest run of each` })
+    ]));
+
+    /* coverage tiles */
+    const tileData = [
+      { label: "Hosts scanned", value: num(st.total), delta: prev ? diffLabel(st.total, prev.stats.total) : "" },
+      { label: "Reachable", value: num(st.reachable), delta: `${pct(st.reachable, st.measured)} of measured hosts` },
+      { label: "Unreachable", value: num(st.state.unreachable), delta: `${pct(st.state.unreachable, st.measured)} of measured hosts` },
+      { label: "Timed out", value: num(st.state.timeout), delta: "never measured, excluded from ratios" }
+    ];
+    const tiles = el("div", { class: "tiles" });
+    for (const t of tileData) {
+      tiles.append(el("div", { class: "tile" }, [
+        el("div", { class: "label", text: t.label }),
+        el("div", { class: "value", text: t.value }),
+        t.delta ? el("div", { class: "delta", text: t.delta }) : null
+      ]));
+    }
+    frag.append(el("div", { class: "card" }, [
+      el("h2", { text: "Scan coverage" }),
+      el("p", { class: "cap", text: `${scan.name} · ${scan.date}` }),
+      tiles
+    ]));
+
+    /* OS distribution for the selected scan */
+    const osItems = OS_ORDER
+      .map((c) => ({ key: c, label: c, value: st.os[c] }))
+      .filter((i) => i.value > 0)
+      .sort((a, b) => b.value - a.value);
+    const osMax = Math.max(...osItems.map((i) => i.value));
+    frag.append(el("div", { class: "card" }, [
+      el("h2", { text: "OS class among reachable nodes" }),
+      el("p", { class: "cap", text: `${monthLabel(scan.key)} · n = ${num(st.reachable)} reachable hosts` }),
+      hbars(osItems, {
+        max: osMax,
+        colorOf: (i) => OS_COLOR[i.key],
+        format: (i) => `${pctNum(i.value, st.reachable).toFixed(1)}%<span class="n">${num(i.value)}</span>`,
+        tipOf: (i) => `<div class="t-title"><span class="swatch" style="background:${OS_COLOR[i.key]}"></span>${i.label}</div>
+                       <div class="t-row">${num(i.value)} nodes · ${pct(i.value, st.reachable)} of reachable</div>`
+      })
+    ]));
+
+    /* composition over time */
+    if (scans.length > 1) {
+      frag.append(el("div", { class: "card" }, [
+        el("h2", { text: "OS class share over time" }),
+        stackedChart(scans, {
+          order: OS_ORDER.filter((k) => scans.some((s) => s.stats.os[k] > 0)),
+          colorOf: (k) => OS_COLOR[k],
+          valueOf: (s, k) => s.stats.os[k],
+          labelPrimary: "Linux",
+          unit: "nodes",
+          caption: "Share of reachable nodes per monthly scan",
+          legendNoun: "a class"
+        })
+      ]));
+
+      frag.append(el("div", { class: "card" }, [
+        el("h2", { text: "Host state over time" }),
+        stackedChart(scans, {
+          order: STATE_ORDER,
+          colorOf: (k) => STATE_COLOR[k],
+          valueOf: (s, k) => s.stats.state[k] || 0,
+          labelPrimary: "reachable",
+          unit: "hosts",
+          caption: "Share of all scanned hosts per monthly scan",
+          legendNoun: "a state"
+        })
+      ]));
+    }
+
+    /* accuracy */
+    const accItems = OS_ORDER
+      .map((c) => ({ key: c, label: c, a: st.acc[c] }))
+      .filter((i) => i.a.n > 0)
+      .map((i) => ({ key: i.key, label: i.label, value: i.a.sum / i.a.n, a: i.a }))
+      .sort((a, b) => b.value - a.value);
+    frag.append(el("div", { class: "card" }, [
+      el("h2", { text: "Average nmap accuracy by OS class" }),
+      el("p", { class: "cap", text: "Confidence in the raw version guess before it was generalised into a class. Unknown is low by definition: anything under 70% is downgraded there." }),
+      hbars(accItems, {
+        max: 100,
+        colorOf: (i) => OS_COLOR[i.key],
+        format: (i) => `${i.value.toFixed(1)}<span class="n">n=${num(i.a.n)}</span>`,
+        tipOf: (i) => `<div class="t-title"><span class="swatch" style="background:${OS_COLOR[i.key]}"></span>${i.label}</div>
+                       <div class="t-row">avg ${i.value.toFixed(1)} · min ${i.a.min} · max ${i.a.max}</div>
+                       <div class="t-row">n = ${num(i.a.n)} guesses</div>`
+      })
+    ]));
+
+    /* table view */
+    const tableCard = el("div", { class: "card" });
+    const toggle = el("button", { class: "btn", type: "button", text: "Show table view" });
+    const tv = el("div", { id: "tableview", hidden: true, class: "scroll-x" }, [table(scans)]);
+    toggle.addEventListener("click", () => {
+      tv.hidden = !tv.hidden;
+      toggle.textContent = tv.hidden ? "Show table view" : "Hide table view";
+    });
+    tableCard.append(
+      el("h2", { text: "Table view" }),
+      el("p", { class: "cap", text: "Every number in the charts above, all monthly scans." }),
+      toggle, tv
+    );
+    frag.append(tableCard);
+
+    app.replaceChildren(frag);
+    hideTip();
+  }
+
+  function diffLabel(now, before) {
+    const d = now - before;
+    if (!d) return "no change vs previous scan";
+    return `${d > 0 ? "+" : "−"}${num(Math.abs(d))} vs previous scan`;
+  }
+
+  function table(scans) {
+    const t = el("table");
+    const head = el("tr", {}, [el("th", { text: "Metric" })]);
+    for (const s of scans) head.append(el("th", { text: `${monthLabel(s.key)}` }));
+    t.append(el("thead", {}, [head]));
+
+    const body = el("tbody");
+    const row = (label, fn) => {
+      const tr = el("tr", {}, [el("td", { text: label })]);
+      for (const s of scans) tr.append(el("td", { text: fn(s.stats) }));
+      body.append(tr);
+    };
+    row("Hosts scanned", (st) => num(st.total));
+    for (const k of STATE_ORDER) row(k.charAt(0).toUpperCase() + k.slice(1), (st) => `${num(st.state[k] || 0)} (${pct(st.state[k] || 0, st.total)})`);
+    for (const c of OS_ORDER) {
+      if (!scans.some((s) => s.stats.os[c] > 0)) continue;
+      row(`${c} (of reachable)`, (st) => `${num(st.os[c])} (${pct(st.os[c], st.reachable)})`);
+    }
+    for (const c of OS_ORDER) {
+      if (!scans.some((s) => s.stats.acc[c].n > 0)) continue;
+      row(`${c} avg accuracy`, (st) => st.acc[c].n ? (st.acc[c].sum / st.acc[c].n).toFixed(1) : "—");
+    }
+    t.append(body);
+    return t;
+  }
+
+  function fail(message) {
+    app.replaceChildren(el("div", { class: "card msg" }, [
+      el("p", { text: message }),
+      el("button", { class: "btn", type: "button", text: "Retry", onclick: boot })
+    ]));
+  }
+
+  async function boot() {
+    app.replaceChildren(el("div", { class: "card msg", text: "Loading scans from GitHub…" }));
+    try {
+      const scans = await loadScans();
+      render(scans, scans[scans.length - 1].key);
+    } catch (err) {
+      fail(err && err.message ? err.message : "Could not load the scan data.");
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
