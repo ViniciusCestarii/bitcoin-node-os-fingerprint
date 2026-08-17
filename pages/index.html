@@ -259,8 +259,11 @@
 (() => {
   "use strict";
 
-  const REPO = "ViniciusCestarii/bitcoin-node-os-fingerprint";
+  // Same-origin, served by GitHub Pages next to this file. index.json is a
+  // build-time manifest of data/ (see scripts/build_pages.sh) — the GitHub
+  // contents API used to provide the listing and rate-limited at 60 req/h.
   const DATA_DIR = "data";
+  const MANIFEST_URL = `${DATA_DIR}/index.json`;
   // scan-YYYY-MM-DD.csv only; the "-legacy" suffixed files never match.
   const SCAN_RE = /^scan-(\d{4})-(\d{2})-(\d{2})\.csv$/;
 
@@ -385,29 +388,22 @@
   }
 
   async function loadScans() {
-    const listUrl = `https://api.github.com/repos/${REPO}/contents/${DATA_DIR}`;
-    const res = await fetch(listUrl, { headers: { Accept: "application/vnd.github+json" } });
-    if (!res.ok) {
-      throw new Error(
-        res.status === 403
-          ? "GitHub's API rate limit for this IP was hit (60 requests/hour, unauthenticated). Try again in a few minutes."
-          : `GitHub API returned ${res.status} ${res.statusText}.`
-      );
-    }
-    const files = await res.json();
+    const res = await fetch(MANIFEST_URL);
+    if (!res.ok) throw new Error(`Could not load the scan list (${res.status} ${res.statusText}).`);
+    const files = (await res.json()).files || [];
 
     // one scan per month: the latest day in each month wins
     const byMonth = new Map();
-    for (const f of files) {
-      const m = SCAN_RE.exec(f.name);
-      if (!m || f.type !== "file") continue;
+    for (const name of files) {
+      const m = SCAN_RE.exec(name);
+      if (!m) continue;
       const key = `${m[1]}-${m[2]}`;
       const prev = byMonth.get(key);
-      if (!prev || f.name > prev.name) {
-        byMonth.set(key, { key, name: f.name, date: `${m[1]}-${m[2]}-${m[3]}`, url: f.download_url, size: f.size });
+      if (!prev || name > prev.name) {
+        byMonth.set(key, { key, name, date: `${m[1]}-${m[2]}-${m[3]}`, url: `${DATA_DIR}/${name}` });
       }
     }
-    if (!byMonth.size) throw new Error("No scan-YYYY-MM-DD.csv files found in the repository's data/ directory.");
+    if (!byMonth.size) throw new Error("No scan-YYYY-MM-DD.csv files listed in data/index.json.");
 
     const picked = [...byMonth.values()].sort((a, b) => a.date.localeCompare(b.date));
     return Promise.all(picked.map(async (s) => {

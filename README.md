@@ -4,7 +4,7 @@ Scans publicly reachable Bitcoin nodes with `nmap ` to guess their operating
 system, then aggregates the results into general OS classes (Linux, BSD,
 Windows, macOS, Android, Solaris, etc.) for statistics.
 
-Plotted results: https://viniciuscestarii.github.io/bitcoin-node-os-fingerprint/pages/
+Plotted results: https://viniciuscestarii.github.io/bitcoin-node-os-fingerprint
 
 ## Methodology limitations
 
