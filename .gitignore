@@ -3,4 +3,8 @@ __pycache__
 
 raw-scan*
 bitcoin_nodes-*.csv
+<<<<<<< Updated upstream
 _site
+=======
+scripts/non-release-*
+>>>>>>> Stashed changes
