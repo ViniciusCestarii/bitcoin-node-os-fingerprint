@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Monthly cronjob: download the current Bitnodes CSV, run the OS
+# Monthly cronjob: download the latest btcnodes.io snapshot, run the OS
 # fingerprint scan, filter/classify it, and push the new scan data.
 #
 # Suggested crontab entry (runs at 03:00 on the 1st of every month,
@@ -23,14 +23,15 @@ DATA_DIR="$REPO_DIR/data"
 DATE="$(date +%F)"
 
 IMAGE_NAME="bitcoin-node-scanner"
-NODES_URL="https://bitnod.es/csv/bitcoin_nodes_${DATE}.csv"
+NODES_URL="https://btcnodes.io/api/v1/snapshots/latest/"
 
+NODES_JSON="$DATA_DIR/nodes-snapshot-${DATE}.json"
 NODES_CSV="$DATA_DIR/bitcoin_nodes-${DATE}.csv"
 RAW_SCAN_CSV="$DATA_DIR/raw-scan-${DATE}.csv"
 FILTERED_SCAN_CSV="$DATA_DIR/scan-${DATE}.csv"
 
-# bitnod.es may not have published today's CSV yet at the time cron fires
-# or may be offline, so retry with backoff instead of failing outright.
+# btcnodes.io may be offline when cron fires, so retry with backoff
+# instead of failing outright.
 MAX_ATTEMPTS=12
 RETRY_DELAY=1800 # 30 minutes
 
@@ -40,10 +41,10 @@ git pull --rebase
 
 echo "[$DATE] Downloading node list from $NODES_URL"
 attempt=1
-until curl -fsSL -o "$NODES_CSV" "$NODES_URL"; do
+until curl -fsSL -o "$NODES_JSON" "$NODES_URL"; do
     if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
         echo "[$DATE] Gave up after $attempt attempts: $NODES_URL not available"
-        rm -f "$NODES_CSV"
+        rm -f "$NODES_JSON"
         exit 1
     fi
     echo "[$DATE] Attempt $attempt failed, retrying in ${RETRY_DELAY}s"
@@ -54,7 +55,22 @@ done
 echo "[$DATE] Building scanner image"
 docker build -t "$IMAGE_NAME" "$REPO_DIR"
 
-echo "[$DATE] Running OS fingerprint scan in container"
+echo "[$DATE] Converting snapshot to CSV"
+docker run --rm \
+    -v "$DATA_DIR:/app/data" \
+    "$IMAGE_NAME" \
+    -c '
+import csv, json, sys
+nodes = json.load(open(sys.argv[1]))["nodes"]
+with open(sys.argv[2], "w", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["ip_address", "port"])
+    for addr in nodes:
+        host, port = addr.rsplit(":", 1)
+        w.writerow([host.strip("[]"), port])
+' "/app/data/$(basename "$NODES_JSON")" "/app/data/$(basename "$NODES_CSV")"
+
+echo "[$DATE] Running OS fingerprint scan"
 docker run --rm \
     --network host \
     --cap-add NET_RAW \
@@ -63,7 +79,7 @@ docker run --rm \
     "$IMAGE_NAME" \
     os_fingerprint.py "/app/data/$(basename "$NODES_CSV")" --out "/app/data/$(basename "$RAW_SCAN_CSV")"
 
-echo "[$DATE] Filtering scan in container"
+echo "[$DATE] Filtering scan"
 docker run --rm \
     -v "$DATA_DIR:/app/data" \
     "$IMAGE_NAME" \

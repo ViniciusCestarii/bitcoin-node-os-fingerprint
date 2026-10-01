@@ -27,9 +27,10 @@ Published scans are in [`data/`](data) as `scan-*.csv`:
 
 Requires `nmap` and root.
 
-1. Download a node list from the
-   [Bitnodes node explorer](https://bitnod.es/node_explorer.php), or use any
-   CSV with `ip_address` and `port` columns.
+1. Build a node list from the live
+   [btcnodes.io snapshot](https://btcnodes.io/api/v1/snapshots/latest/)
+   (see `scripts/monthly_scan.sh`), or use any CSV with `ip_address` and
+   `port` columns.
 
 2. Scan:
 
