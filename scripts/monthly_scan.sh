@@ -59,16 +59,7 @@ echo "[$DATE] Converting snapshot to CSV"
 docker run --rm \
     -v "$DATA_DIR:/app/data" \
     "$IMAGE_NAME" \
-    -c '
-import csv, json, sys
-nodes = json.load(open(sys.argv[1]))["nodes"]
-with open(sys.argv[2], "w", newline="") as f:
-    w = csv.writer(f)
-    w.writerow(["ip_address", "port"])
-    for addr in nodes:
-        host, port = addr.rsplit(":", 1)
-        w.writerow([host.strip("[]"), port])
-' "/app/data/$(basename "$NODES_JSON")" "/app/data/$(basename "$NODES_CSV")"
+    data/snapshot_to_csv.py "/app/data/$(basename "$NODES_JSON")" "/app/data/$(basename "$NODES_CSV")"
 
 echo "[$DATE] Running OS fingerprint scan"
 docker run --rm \

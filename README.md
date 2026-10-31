@@ -28,9 +28,13 @@ Published scans are in [`data/`](data) as `scan-*.csv`:
 Requires `nmap` and root.
 
 1. Build a node list from the live
-   [btcnodes.io snapshot](https://btcnodes.io/api/v1/snapshots/latest/)
-   (see `scripts/monthly_scan.sh`), or use any CSV with `ip_address` and
-   `port` columns.
+   [btcnodes.io snapshot](https://btcnodes.io/api/v1/snapshots/latest/),
+   or use any CSV with `ip_address` and `port` columns:
+
+   ```
+   curl -fsSL -o nodes.json https://btcnodes.io/api/v1/snapshots/latest/
+   python3 data/snapshot_to_csv.py nodes.json nodes.csv
+   ```
 
 2. Scan:
 

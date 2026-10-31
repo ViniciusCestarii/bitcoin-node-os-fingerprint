@@ -8,6 +8,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 WORKDIR /app
 COPY os_fingerprint.py .
+COPY data/snapshot_to_csv.py data/snapshot_to_csv.py
 COPY data/filter_scan.py data/filter_scan.py
 COPY data/analyse_scan.py data/analyse_scan.py
 
