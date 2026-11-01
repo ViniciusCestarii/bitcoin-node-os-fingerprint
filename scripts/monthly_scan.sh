@@ -39,6 +39,13 @@ cd "$REPO_DIR"
 git checkout master
 git pull --rebase
 
+# Re-exec once so we run the version of this script we just pulled,
+# not the stale copy bash already has open.
+if [ -z "${MONTHLY_SCAN_REEXEC:-}" ]; then
+    export MONTHLY_SCAN_REEXEC=1
+    exec "$REPO_DIR/scripts/monthly_scan.sh" "$@"
+fi
+
 echo "[$DATE] Downloading node list from $NODES_URL"
 attempt=1
 until curl -fsSL -o "$NODES_JSON" "$NODES_URL"; do
