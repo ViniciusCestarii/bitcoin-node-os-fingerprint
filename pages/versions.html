@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bitcoin node OS by node version</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-1: #fcfcfb; --page: #f9f9f7;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --unk: #898781;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7;
+    --grid: #2c2c2a; --axis: #383835;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --unk: #898781;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-1: #1a1a19; --page: #0d0d0d;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7;
+  --grid: #2c2c2a; --axis: #383835;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --unk: #898781;
+}
+body { margin: 0; }
+.viz-root { background: var(--page); color: var(--text-primary); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 24px; min-height: 100vh; box-sizing: border-box; }
+.card { background: var(--surface-1); border: 1px solid rgba(11,11,11,0.10); border-radius: 12px; padding: 20px 24px; max-width: 980px; margin: 0 auto 16px; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+.sub { color: var(--text-secondary); margin: 0 0 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 12px; color: var(--text-secondary); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.controls { margin: 0 0 12px; color: var(--text-secondary); }
+svg text { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; }
+.tick { fill: var(--muted); font-variant-numeric: tabular-nums; }
+.lab { fill: var(--text-primary); }
+.n { fill: var(--muted); font-variant-numeric: tabular-nums; }
+.seglab { font-size: 11px; font-variant-numeric: tabular-nums; pointer-events: none; }
+#tip { position: fixed; pointer-events: none; background: var(--surface-1); border: 1px solid rgba(11,11,11,0.10); border-radius: 8px; padding: 8px 10px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: none; font-size: 13px; }
+#tip b { display: block; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--grid); }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-secondary); font-weight: 600; }
+details summary { cursor: pointer; color: var(--text-secondary); }
+.notes li { margin-bottom: 4px; }
+nav { max-width: 980px; margin: 0 auto 12px; font-size: 13px; }
+nav a { color: var(--s1); }
+.msg { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<nav><a href="./">← Scan overview</a> · <a href="as-map.html">OS by autonomous system</a></nav>
+<div class="card">
+  <h1>OS class by node software version</h1>
+  <p class="sub" id="sub"></p>
+  <div class="controls"><label>Scan <select id="scan"></select></label> &nbsp; <label><input type="checkbox" id="unk"> Include Unknown in the share</label></div>
+  <p class="msg" id="msg" hidden></p>
+  <div class="legend" id="legend"></div>
+  <svg id="chart" width="100%" role="img" aria-label="100% stacked bars of OS share per node version group"></svg>
+</div>
+<div class="card">
+  <details><summary>Table view (counts)</summary><div id="table"></div></details>
+</div>
+<div id="tip"></div>
+</div>
+<script>
+// Data comes from data/enriched/<scan>.json, built by data/enrich_scan.py
+// in scripts/build_pages.sh.
+let D = null;
+const COLORS = ["--s1","--s2","--s3","--s4","--s5","--s6","--unk"];
+const LABELS = {Other: "Other / device"};
+const css = v => getComputedStyle(document.querySelector(".viz-root")).getPropertyValue(v).trim();
+const svg = document.getElementById("chart"), tip = document.getElementById("tip");
+const sub = document.getElementById("sub"), msg = document.getElementById("msg");
+
+function setData(d) {
+  const v = d.versions;
+  svg.style.display = v ? "" : "none";
+  msg.hidden = !!v;
+  if (!v) {
+    D = null;
+    sub.textContent = `${d.reachable.toLocaleString()} reachable nodes in ${d.scan}.`;
+    msg.textContent = "No btcnodes.io snapshot is available for this scan date, so node versions are unknown.";
+    document.getElementById("table").innerHTML = "";
+    document.getElementById("legend").innerHTML = "";
+    return;
+  }
+  const all = v.groups.reduce((s, g) => s.map((x, i) => x + g.counts[i]), d.os.map(() => 0));
+  D = {os: d.os, groups: [...v.groups, {name: "All matched", counts: all}]};
+  const when = new Date(v.snapshot * 1000).toISOString().slice(0, 16).replace("T", " ");
+  sub.textContent = `Reachable nodes in ${d.scan} joined by ip:port to the btcnodes.io snapshot of ${when} UTC, for each node's user agent (${v.matched.toLocaleString()} of ${d.reachable.toLocaleString()} reachable matched). Share of nodes with an OS guess; n is the group size.`;
+  document.getElementById("table").innerHTML = "<table><tr><th>Group</th>" + D.os.map(o => `<th>${LABELS[o] || o}</th>`).join("") + "<th>Total</th></tr>" +
+    D.groups.map(g => `<tr><td>${g.name}</td>` + g.counts.map(c => `<td>${c}</td>`).join("") + `<td>${g.counts.reduce((a, b) => a + b, 0)}</td></tr>`).join("") + "</table>";
+  draw();
+}
+
+function draw() {
+  if (!D) return;
+  const withUnk = document.getElementById("unk").checked;
+  const k = withUnk ? 7 : 6;
+  document.getElementById("legend").innerHTML = D.os.slice(0, k)
+    .map((o, i) => `<span style="--c:var(${COLORS[i]})">${LABELS[o] || o}</span>`).join("");
+  const W = svg.clientWidth, L = 130, R = 64, rowH = 26, barH = 18, top = 4;
+  const plotW = W - L - R;
+  const H = top + D.groups.length * rowH + 30 + 10;
+  svg.setAttribute("height", H);
+  let s = "";
+  for (let t = 0; t <= 100; t += 25) {
+    const x = L + plotW * t / 100;
+    s += `<line x1="${x}" x2="${x}" y1="${top}" y2="${H - 26}" stroke="${css("--grid")}" stroke-width="1"/>`;
+    s += `<text class="tick" x="${x}" y="${H - 10}" text-anchor="middle">${t}%</text>`;
+  }
+  D.groups.forEach((g, r) => {
+    const y = top + r * rowH + (r === D.groups.length - 1 ? 10 : 0);
+    const counts = g.counts.slice(0, k), tot = counts.reduce((a, b) => a + b, 0);
+    const all = g.counts.reduce((a, b) => a + b, 0);
+    if (r === D.groups.length - 1) s += `<line x1="0" x2="${W}" y1="${y - 5}" y2="${y - 5}" stroke="${css("--axis")}"/>`;
+    s += `<text class="lab" x="${L - 10}" y="${y + barH / 2 + 4}" text-anchor="end" ${r === D.groups.length - 1 ? 'font-weight="600"' : ""}>${g.name}</text>`;
+    s += `<text class="n" x="${W - R + 8}" y="${y + barH / 2 + 4}">n=${all}</text>`;
+    let x = L;
+    counts.forEach((c, i) => {
+      if (!c) return;
+      const w = plotW * c / tot, pct = c / tot * 100;
+      const gap = 2;
+      const ww = Math.max(w - gap, 0.5);
+      s += `<rect x="${x}" y="${y}" width="${ww}" height="${barH}" rx="2" fill="${css(COLORS[i])}" data-g="${g.name}" data-o="${LABELS[D.os[i]] || D.os[i]}" data-c="${c}" data-p="${pct.toFixed(1)}"/>`;
+      if (w > 34) {
+        const ink = (COLORS[i] === "--s4" || COLORS[i] === "--unk") ? css("--text-primary") : "#ffffff";
+        s += `<text class="seglab" x="${x + ww / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" fill="${ink}">${pct.toFixed(0)}%</text>`;
+      }
+      x += w;
+    });
+  });
+  svg.innerHTML = s;
+}
+svg.addEventListener("mousemove", e => {
+  const t = e.target;
+  if (t.tagName !== "rect") { tip.style.display = "none"; return; }
+  tip.innerHTML = `<b>${t.dataset.g}</b>${t.dataset.o}: ${t.dataset.p}% (${t.dataset.c} nodes)`;
+  tip.style.display = "block";
+  tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+  tip.style.top = (e.clientY + 12) + "px";
+});
+svg.addEventListener("mouseleave", () => tip.style.display = "none");
+document.getElementById("unk").addEventListener("change", draw);
+addEventListener("resize", draw);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+
+const SCAN_RE = /^scan-\d{4}-\d{2}-\d{2}\.csv$/; // -legacy scans are skipped, as on the overview
+function fail(e) { svg.style.display = "none"; msg.hidden = false; msg.textContent = `Could not load the data: ${e.message}`; }
+(async () => {
+  try {
+    const files = ((await (await fetch("data/index.json")).json()).files || []).filter(f => SCAN_RE.test(f)).sort();
+    const sel = document.getElementById("scan"), want = new URLSearchParams(location.search).get("scan");
+    sel.innerHTML = files.map(f => `<option>${f.slice(0, -4)}</option>`).join("");
+    sel.value = files.includes(want + ".csv") ? want : files.at(-1).slice(0, -4);
+    const load = async () => {
+      history.replaceState(null, "", "?scan=" + sel.value);
+      const r = await fetch(`data/enriched/${sel.value}.json`);
+      if (!r.ok) throw new Error(`Could not load ${sel.value} (${r.status}).`);
+      setData(await r.json());
+    };
+    sel.onchange = () => load().catch(fail);
+    await load();
+  } catch (e) { fail(e); }
+})();
+</script>
+</body>
+</html>

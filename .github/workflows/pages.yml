@@ -6,6 +6,7 @@ on:
     paths:
       - "pages/**"
       - "data/scan-*.csv"
+      - "data/enrich_scan.py"
       - "scripts/build_pages.sh"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
