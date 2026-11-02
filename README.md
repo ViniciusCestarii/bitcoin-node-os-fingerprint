@@ -23,6 +23,17 @@ Published scans are in [`data/`](data) as `scan-*.csv`:
 - `Other`: an OS outside the tracked classes.
 - `timeout`: nmap was killed before reporting. The host was never measured, so exclude it from reachability ratios.
 
+Each scan has an `enrich-*.csv` with the same date: one row per reachable node, looked up when the scan was made so it reflects the network at that time (`data/enrich_scan.py`):
+
+| column | values |
+| --- | --- |
+| `ip_address`, `port` | join keys into the matching `scan-*.csv` |
+| `asn`, `as_name`, `as_country` | AS announcing the IP and the country it is registered in ([iptoasn.com](https://iptoasn.com)), empty if unrouted |
+| `country` | where the IP is located ([IP Geolocation by DB-IP](https://db-ip.com), CC BY 4.0), empty if unknown |
+| `user_agent` | node software reported by the [btcnodes.io](https://btcnodes.io) snapshot the scan used, empty if not listed |
+
+Enrich files for scans before 2026-11-01 were backfilled on that date: AS data from that day, DB-IP from the closest month still available (2026-09 for July and August), and the btcnodes.io snapshot from the end of each scan date.
+
 ## Usage
 
 Requires `nmap` and root.

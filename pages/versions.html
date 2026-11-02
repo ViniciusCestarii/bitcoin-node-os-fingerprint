@@ -86,15 +86,14 @@ function setData(d) {
   if (!v) {
     D = null;
     sub.textContent = `${d.reachable.toLocaleString()} reachable nodes in ${d.scan}.`;
-    msg.textContent = "No btcnodes.io snapshot is available for this scan date, so node versions are unknown.";
+    msg.textContent = "No node user agents were recorded for this scan, so versions are unknown.";
     document.getElementById("table").innerHTML = "";
     document.getElementById("legend").innerHTML = "";
     return;
   }
   const all = v.groups.reduce((s, g) => s.map((x, i) => x + g.counts[i]), d.os.map(() => 0));
   D = {os: d.os, groups: [...v.groups, {name: "All matched", counts: all}]};
-  const when = new Date(v.snapshot * 1000).toISOString().slice(0, 16).replace("T", " ");
-  sub.textContent = `Reachable nodes in ${d.scan} joined by ip:port to the btcnodes.io snapshot of ${when} UTC, for each node's user agent (${v.matched.toLocaleString()} of ${d.reachable.toLocaleString()} reachable matched). Share of nodes with an OS guess; n is the group size.`;
+  sub.textContent = `Reachable nodes in ${d.scan} with the user agent btcnodes.io reported for them around the scan date (${v.matched.toLocaleString()} of ${d.reachable.toLocaleString()} reachable matched). Share of nodes with an OS guess; n is the group size.`;
   document.getElementById("table").innerHTML = "<table><tr><th>Group</th>" + D.os.map(o => `<th>${LABELS[o] || o}</th>`).join("") + "<th>Total</th></tr>" +
     D.groups.map(g => `<tr><td>${g.name}</td>` + g.counts.map(c => `<td>${c}</td>`).join("") + `<td>${g.counts.reduce((a, b) => a + b, 0)}</td></tr>`).join("") + "</table>";
   draw();

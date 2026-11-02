@@ -29,6 +29,7 @@ NODES_JSON="$DATA_DIR/nodes-snapshot-${DATE}.json"
 NODES_CSV="$DATA_DIR/bitcoin_nodes-${DATE}.csv"
 RAW_SCAN_CSV="$DATA_DIR/raw-scan-${DATE}.csv"
 FILTERED_SCAN_CSV="$DATA_DIR/scan-${DATE}.csv"
+ENRICH_CSV="$DATA_DIR/enrich-${DATE}.csv"
 
 # btcnodes.io may be offline when cron fires, so retry with backoff
 # instead of failing outright.
@@ -83,8 +84,31 @@ docker run --rm \
     "$IMAGE_NAME" \
     data/filter_scan.py "/app/data/$(basename "$RAW_SCAN_CSV")" "/app/data/$(basename "$FILTERED_SCAN_CSV")"
 
+# Freeze AS, country and user agent per node now, so the site shows the
+# network as it was at scan time. Best effort: a failed download leaves the
+# scan without an enrich file (backfill later with data/enrich_scan.py).
+echo "[$DATE] Enriching scan"
+DB_DIR="$(mktemp -d)"
+trap 'rm -rf "$DB_DIR"' EXIT
+if curl -fsSL -o "$DB_DIR/ip2asn.tsv.gz" https://iptoasn.com/data/ip2asn-combined.tsv.gz &&
+    { curl -fsSL -o "$DB_DIR/dbip.csv.gz" "https://download.db-ip.com/free/dbip-country-lite-${DATE:0:7}.csv.gz" ||
+      # DB-IP publishes monthly and may not have this month's file yet
+      curl -fsSL -o "$DB_DIR/dbip.csv.gz" "https://download.db-ip.com/free/dbip-country-lite-$(date -d "${DATE:0:7}-01 -1 month" +%Y-%m).csv.gz"; }; then
+    docker run --rm \
+        -v "$DATA_DIR:/app/data" \
+        -v "$DB_DIR:/app/db:ro" \
+        "$IMAGE_NAME" \
+        data/enrich_scan.py "/app/data/$(basename "$FILTERED_SCAN_CSV")" "/app/data/$(basename "$ENRICH_CSV")" \
+        --ip2asn /app/db/ip2asn.tsv.gz --dbip /app/db/dbip.csv.gz \
+        --snapshot "/app/data/$(basename "$NODES_JSON")" ||
+        { echo "[$DATE] Enrichment failed, committing the scan without it"; rm -f "$ENRICH_CSV"; }
+else
+    echo "[$DATE] Could not download the AS/country databases, skipping enrichment"
+fi
+
 echo "[$DATE] Committing and pushing results"
 git add "$FILTERED_SCAN_CSV"
+[ -f "$ENRICH_CSV" ] && git add "$ENRICH_CSV"
 git commit -m "[AUTO] add new scan scan-${DATE}.csv"
 git pull --rebase
 git push
