@@ -39,6 +39,11 @@ def classify(os_name: str) -> str:
     if not os_name:
         return "Unknown"
 
+    # Darwin-based iOS/tvOS guesses are almost certainly macOS hosts that
+    # nmap can't tell apart from Apple's mobile OSes.
+    if re.search(r"\bdarwin\b", os_name, re.I):
+        return "macOS"
+
     if DEVICE_KEYWORD_PATTERN.search(os_name):
         return "Other/Device"
 

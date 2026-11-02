@@ -1,5 +1,9 @@
 # Changelog
 
+## Darwin-based OS guesses classified as macOS (2026-12-01)
+
+From `scan-2026-12-01.csv` on, any guess with a Darwin version (including "Apple iOS"/"tvOS") counts as macOS instead of Other/Device, since nmap can't reliably tell them apart and they are most likely Macs, not phones or TVs, running a node. Earlier scans are not re-classified.
+
 ## Node list switched to the live btcnodes.io snapshot (2026-10-01)
 
 Scans up to and including `scan-2026-10-01.csv` took their targets from
